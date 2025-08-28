@@ -51,10 +51,10 @@ function LogoHUD() {
     const scaleUp = smoothstepRange(t, 0.33, 0.66);
 
     // Step 3 (66%→100%): Hold (you can add more effects here if you like)
-    const hold = smoothstepRange(t, 0.66, 1.0); // currently unused, but kept for extension
+    const hold = smoothstepRange(t, 0.66, 1.0);
 
-    const opacity = fadeIn;                // 0 → 1 during step 1
-    const scale = 0.8 + 0.2 * scaleUp;    // 0.8 → 1.0 during step 2
+    const opacity = fadeIn;              
+    const scale = 0.8 + 0.2 * scaleUp;   
 
     if (imgRef.current) {
       const mat = imgRef.current.material;
@@ -64,15 +64,15 @@ function LogoHUD() {
     }
   });
 
-  // Position [-z] means “in front of camera” when nested inside the camera node
   return (
     <Image
       ref={imgRef}
-      url="/assets/logo.png"        // put your logo in /public/assets/logo.png
+      url="/assets/logo.png"       
       transparent
-      depthTest={false}             // always render on top
-      position={[0, 0, -2]}         // centered, 2 units in front of camera
-      scale={[1, 1, 1]}             // base scale (will be animated)
+      depthTest={false}        
+      position={[0, 0, -2]}      
+      scale={[2, 1, 1]}
+              
     />
   );
 }
@@ -98,14 +98,14 @@ function Scene() {
 
 export default function App() {
   return (
-    <div className="w-screen h-screen relative bg-black overflow-hidden">
+    <div className="w-screen h-screen relative bg-black ">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        dpr={[1, 2]}
+        dpr={[1, 3]}
         className="absolute top-0 left-0 w-full h-full"
       >
-        {/* pages = total scroll length; 3 gives you roomy steps */}
-        <ScrollControls pages={7} damping={0.2}>
+        {/* damping = Adds smoothness to the scroll effect. */}
+        <ScrollControls pages={15} damping={0.3}>
           <Scene />
         </ScrollControls>
       </Canvas>
