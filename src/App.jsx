@@ -26,7 +26,7 @@ function VideoBackground() {
     crossOrigin: "Anonymous",
   });
 
-  const scale = useAspect(1920, 1080, 1); // fullscreen scaling
+  const scale = useAspect(1920, 1080, 1);
   return (
     <mesh scale={scale}>
       <planeGeometry args={[1, 1]} />
@@ -68,22 +68,17 @@ function LogoHUD() {
   );
 }
 
-/** CameraRig with zoom-in/out + mouse pan */
+/** CameraRig with zoom only (no mouse pan) */
 function CameraRig() {
   const cam = useRef();
   const scroll = useScroll();
 
-  useFrame((state) => {
+  useFrame(() => {
     const t = scroll.offset; // scroll progress 0..1
 
     if (cam.current) {
       // 🔹 Scroll → Zoom (moving camera in/out)
-      cam.current.position.z = 5 - 2.5 * smoothstepRange(t, 0, 1);
-
-      // 🔹 Mouse move → Pan slightly
-      const { mouse } = state;
-      cam.current.position.x = mouse.x * 1.5; // left/right
-      cam.current.position.y = mouse.y * -1.0; // up/down
+      cam.current.position.z = 5 - 0.5 * smoothstepRange(t, 0, 1);
 
       cam.current.updateProjectionMatrix();
     }
