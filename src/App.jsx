@@ -17,17 +17,16 @@ function smoothstepRange(t, start, end) {
   return x * x * (3 - 2 * x);
 }
 
-/** Full-bleed video that covers the viewport */
+/** Fullscreen background video */
 function VideoBackground() {
-  // Autoplaying, muted loop; place your file in /public/videos/section-1-bg.mp4
   const texture = useVideoTexture("/videos/section-1-bg.mp4", {
     start: true,
     loop: true,
     muted: true,
     crossOrigin: "Anonymous",
   });
-  // Scale a 1x1 plane to cover the viewport using the video's aspect (1920x1080 here)
-  const scale = useAspect(1920, 1080, 1); // width, height, factor
+
+  const scale = useAspect(1920, 1080, 1); // fullscreen scaling
   return (
     <mesh scale={scale}>
       <planeGeometry args={[1, 1]} />
@@ -36,25 +35,18 @@ function VideoBackground() {
   );
 }
 
-/** Logo that lives in camera space and animates with scroll (steps) */
+/** Logo HUD */
 function LogoHUD() {
   const imgRef = useRef();
   const scroll = useScroll();
 
   useFrame(() => {
-    const t = scroll.offset; // 0..1 across all pages
-
-    // Step 1 (0%→33%): Fade in
+    const t = scroll.offset;
     const fadeIn = smoothstepRange(t, 0.0, 0.33);
-
-    // Step 2 (33%→66%): Scale up 0.8 → 1.0
     const scaleUp = smoothstepRange(t, 0.33, 0.66);
 
-    // Step 3 (66%→100%): Hold (you can add more effects here if you like)
-    const hold = smoothstepRange(t, 0.66, 1.0);
-
-    const opacity = fadeIn;              
-    const scale = 0.8 + 0.2 * scaleUp;   
+    const opacity = fadeIn;
+    const scale = 0.8 + 0.2 * scaleUp;
 
     if (imgRef.current) {
       const mat = imgRef.current.material;
@@ -67,20 +59,38 @@ function LogoHUD() {
   return (
     <Image
       ref={imgRef}
-      url="/assets/logo.png"       
+      url="/assets/logo.png"
       transparent
-      depthTest={false}        
-      position={[0, 0, -2]}      
+      depthTest={false}
+      position={[0, 0, -2]}
       scale={[2, 1, 1]}
-              
     />
   );
 }
 
-/** Camera with HUD contents parented so they move with the camera */
+/** CameraRig with zoom-in/out + mouse pan */
 function CameraRig() {
+  const cam = useRef();
+  const scroll = useScroll();
+
+  useFrame((state) => {
+    const t = scroll.offset; // scroll progress 0..1
+
+    if (cam.current) {
+      // 🔹 Scroll → Zoom (moving camera in/out)
+      cam.current.position.z = 5 - 2.5 * smoothstepRange(t, 0, 1);
+
+      // 🔹 Mouse move → Pan slightly
+      const { mouse } = state;
+      cam.current.position.x = mouse.x * 1.5; // left/right
+      cam.current.position.y = mouse.y * -1.0; // up/down
+
+      cam.current.updateProjectionMatrix();
+    }
+  });
+
   return (
-    <PerspectiveCamera makeDefault position={[0, 0, 5]}>
+    <PerspectiveCamera ref={cam} makeDefault position={[0, 0, 5]}>
       <LogoHUD />
     </PerspectiveCamera>
   );
@@ -98,13 +108,12 @@ function Scene() {
 
 export default function App() {
   return (
-    <div className="w-screen h-screen relative bg-black ">
+    <div className="w-screen h-screen relative bg-black">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
         dpr={[1, 3]}
         className="absolute top-0 left-0 w-full h-full"
       >
-        {/* damping = Adds smoothness to the scroll effect. */}
         <ScrollControls pages={15} damping={0.3}>
           <Scene />
         </ScrollControls>
