@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useVideoTexture } from "@react-three/drei";
 import { smoothstepRange } from "../utils/smoothstep";
-import { useScrollVideoScrub } from "../hooks/useScrollVideoScrub";
 
 export default function LogoVideoHUD({ scroll }) {
     // Just pass the URL string (drei creates the <video> for us)
