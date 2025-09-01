@@ -31,9 +31,11 @@ export default function VideoBackground({ scroll }) {
   });
 
   return (
-    <mesh ref={meshRef} scale={scale}>
+    <mesh ref={meshRef} scale={scale} position={[0, 0, 1]}>
+      {/* 👆 Push video slightly backward */}
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
   );
+
 }
