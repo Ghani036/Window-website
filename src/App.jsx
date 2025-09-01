@@ -6,7 +6,6 @@ import {
   useAspect,
   ScrollControls,
   useScroll,
-  Image,
   PerspectiveCamera,
   Preload,
 } from "@react-three/drei";
@@ -18,7 +17,7 @@ function smoothstepRange(t, start, end) {
 }
 
 /** Fullscreen background video */
-function VideoBackground() {
+function VideoBackground({ scroll }) {
   const texture = useVideoTexture("/videos/section-1-bg.mp4", {
     start: true,
     loop: true,
@@ -27,75 +26,111 @@ function VideoBackground() {
   });
 
   const scale = useAspect(1920, 1080, 1);
+  const meshRef = useRef();
+
+  useFrame(() => {
+    const t = scroll.offset;
+
+    // 🔹 Phase 1: Start zoomed in
+    const startZoom = 1.2; // initial zoom
+    const endZoom = 1.0; // after zoom out
+
+    // Phase 1: Zoom out on first scroll section
+    const zoomOut = startZoom - 0.2 * smoothstepRange(t, 0, 0.2);
+
+    // Phase 2: Slight zoom in cycles on later scrolls
+    const pulseZoom = 1.0 + 0.1 * Math.sin(t * Math.PI * 2);
+
+    const finalZoom = t < 0.2 ? zoomOut : pulseZoom;
+
+    if (meshRef.current) {
+      meshRef.current.scale.set(
+        scale[0] * finalZoom,
+        scale[1] * finalZoom,
+        1
+      );
+    }
+  });
+
   return (
-    <mesh scale={scale}>
+    <mesh ref={meshRef} scale={scale}>
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
   );
 }
 
-/** Logo HUD */
-function LogoHUD() {
-  const imgRef = useRef();
-  const scroll = useScroll();
+/** Logo Reveal Video HUD (plays progressively with scroll) */
+/** Logo Reveal Video HUD (plays progressively with scroll) */
+function LogoVideoHUD({ scroll }) {
+  // Just pass the URL string (drei creates the <video> for us)
+  const texture = useVideoTexture("/videos/logo-reveal.mp4", {
+    start: false, // we will control playback manually
+    loop: false,
+    muted: true,
+    crossOrigin: "Anonymous",
+  });
+
+  const meshRef = useRef();
+  const videoRef = texture.image; // the <video> element inside texture
 
   useFrame(() => {
     const t = scroll.offset;
-    const fadeIn = smoothstepRange(t, 0.0, 0.33);
-    const scaleUp = smoothstepRange(t, 0.33, 0.66);
 
-    const opacity = fadeIn;
-    const scale = 0.8 + 0.2 * scaleUp;
+    // 🔹 Logo reveal starts at 0.3 and ends at 0.6 scroll
+    const revealProgress = smoothstepRange(t, 0.3, 0.6);
 
-    if (imgRef.current) {
-      const mat = imgRef.current.material;
-      mat.transparent = true;
-      mat.opacity = opacity;
-      imgRef.current.scale.set(scale, scale, 1);
+    // Scrub video based on scroll progress
+    if (videoRef && videoRef.readyState >= 2 && videoRef.duration) {
+      videoRef.currentTime = videoRef.duration * revealProgress;
+    }
+
+    if (meshRef.current) {
+      // Fade out after reveal finishes
+      meshRef.current.material.opacity =
+        revealProgress < 1 ? 1 : 1 - smoothstepRange(t, 0.6, 0.65);
     }
   });
 
   return (
-    <Image
-      ref={imgRef}
-      url="/assets/logo.png"
-      transparent
-      depthTest={false}
-      position={[0, 0, -2]}
-      scale={[2, 1, 1]}
-    />
+    <mesh ref={meshRef} position={[0, 0, -1]} scale={[2, 1, 1]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0}
+        depthTest={false}
+      />
+    </mesh>
   );
 }
 
-/** CameraRig with zoom only (no mouse pan) */
-function CameraRig() {
+
+/** CameraRig with scroll-controlled zoom */
+function CameraRig({ scroll }) {
   const cam = useRef();
-  const scroll = useScroll();
 
   useFrame(() => {
-    const t = scroll.offset; // scroll progress 0..1
+    const t = scroll.offset;
 
     if (cam.current) {
-      // 🔹 Scroll → Zoom (moving camera in/out)
+      // Camera slight zoom on scroll
       cam.current.position.z = 5 - 0.5 * smoothstepRange(t, 0, 1);
-
       cam.current.updateProjectionMatrix();
     }
   });
 
-  return (
-    <PerspectiveCamera ref={cam} makeDefault position={[0, 0, 5]}>
-      <LogoHUD />
-    </PerspectiveCamera>
-  );
+  return <PerspectiveCamera ref={cam} makeDefault position={[0, 0, 5]} />;
 }
 
 function Scene() {
+  const scroll = useScroll();
+
   return (
     <>
-      <VideoBackground />
-      <CameraRig />
+      <VideoBackground scroll={scroll} />
+      <LogoVideoHUD scroll={scroll} />
+      <CameraRig scroll={scroll} />
       <Preload all />
     </>
   );
