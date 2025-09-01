@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 
+@font-face {
+  font-family: 'avenir';
+  src: url('./assets/fonts/avenir.woff2') format('woff2');
+  font-style: normal;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 400;

@@ -5,7 +5,7 @@ import Scene from "./components/Scene";
 
 export default function App() {
   return (
-    <div className="w-screen h-screen relative bg-black">
+    <div className="w-screen h-screen relative ">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
         dpr={[1, 3]}
