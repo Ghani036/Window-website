@@ -9,6 +9,7 @@ import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 
+
 const MENUS = [
   { name: "THE WINDOW", sub: ["The Founder", "Joined Forces", "The Systems"] },
   {
@@ -25,70 +26,92 @@ const MENUS = [
 
 export default function Scene() {
   const scroll = useScroll();
-  const [visibleIndex, setVisibleIndex] = useState(-1);
+  const [visibleMenus, setVisibleMenus] = useState(-1);
+  const [visibleSubs, setVisibleSubs] = useState(-1);
 
-  // Track scroll and show menus one by one
   useEffect(() => {
-    const unsubscribe = scroll.el.addEventListener("scroll", () => {
-      const progress = scroll.scroll.current; // scroll progress 0 -> 1
-      const nextIndex = Math.floor(progress * MENUS.length);
+    const handleScroll = () => {
+      const progress = scroll.scroll.current; // 0 → 1
 
-      if (nextIndex !== visibleIndex) {
-        setVisibleIndex(nextIndex);
-      }
-    });
+      // total items = menus + all submenus
+      const totalMenus = MENUS.length;
+      const totalSubs = MENUS.reduce((sum, m) => sum + m.sub.length, 0);
+      const totalItems = totalMenus + totalSubs;
 
-    return () => scroll.el.removeEventListener("scroll", unsubscribe);
-  }, [scroll, visibleIndex]);
+      // map progress to totalItems
+      const currentIndex = Math.floor(progress * totalItems);
+
+      // update visible menus
+      const menuIndex = Math.min(currentIndex, totalMenus - 1);
+      setVisibleMenus(menuIndex);
+
+      // update visible submenus (start after all menus are visible)
+      const subIndex = currentIndex - totalMenus;
+      setVisibleSubs(subIndex);
+    };
+
+    const el = scroll.el;
+    el.addEventListener("scroll", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+    };
+  }, [scroll]);
+
+  let subCounter = 0;
 
   return (
     <>
       <Html fullscreen>
         <div className="absolute font-semibold top-0 left-1/4 w-1/2 ml-auto mr-auto flex justify-between p-4">
           {MENUS.map((item, index) => (
-            <div key={index} className="relative group">
-              {index <= visibleIndex ? (
+            <div key={index} className="relative">
+              {/* Main Menus */}
+              {index <= visibleMenus ? (
                 <>
-                  {/* Dust animation first */}
                   <Lottie
                     animationData={dustAnimation}
                     loop={false}
                     className="absolute"
                     style={{ width: 120, height: 120 }}
                   />
-                  {/* Menu text appears after dust */}
                   <motion.span
                     className="text-gray-200 font-avenir text-[18px] border-b border-white"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ delay: 0.7 }}
                   >
                     {item.name}
                   </motion.span>
 
-                  {/* Submenus with dust + stagger animation */}
-                  <div className="absolute left-0 hidden flex-col rounded-md p-1 pl-4 group-hover:flex">
-                    {item.sub.map((subMenuItem, subIdx) => (
-                      <motion.div
-                        key={subIdx}
-                        className="text-sm w-max flex justify-center items-center text-gray-300 hover:text-white py-1 px-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.8 + subIdx * 0.2 }}
-                      >
-                        <Lottie
-                          animationData={dustAnimation}
-                          loop={false}
-                          style={{ width: 20, height: 20, marginRight: 8 }}
-                        />
-                        <div className=" animate-bounce " >{subMenuItem}</div>
-                      </motion.div>
-                    ))}
+                  {/* Submenus appear progressively on scroll */}
+                  <div className="flex flex-col p-1 pl-4 mt-2">
+                    {item.sub.map((subItem, subIdx) => {
+                      const globalSubIndex = subCounter++;
+                      return globalSubIndex <= visibleSubs ? (
+                        <motion.div
+                          key={subIdx}
+                          className="text-sm w-max flex items-center text-gray-300 py-1 px-2"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          <Lottie
+                            animationData={dustAnimation}
+                            loop={false}
+                            style={{ width: 20, height: 20, marginRight: 8 }}
+                          />
+                          <div>{subItem}</div>
+                        </motion.div>
+                      ) : null;
+                    })}
                   </div>
                 </>
               ) : null}
             </div>
           ))}
+
+
         </div>
       </Html>
 
