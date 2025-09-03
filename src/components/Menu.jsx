@@ -60,7 +60,14 @@ export default function Menu({ visibleSubs }) {
                                         className="absolute -top-2"
                                         style={{ width: 120, height: 120 }}
                                     />
-                                    <div>{subItem}</div>
+                                    <motion.span
+                                        className=" font-avenir "
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.7 }}
+                                    >
+                                        - {subItem}
+                                    </motion.span>
                                 </motion.div>
                             ) : null;
                         })}
