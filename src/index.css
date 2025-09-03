@@ -2,10 +2,12 @@
 
 
 @font-face {
-  font-family: 'avenir';
-  src: url('./assets/fonts/avenir.woff2') format('woff2');
+  font-family: 'Avenir';
+  src: url('/src/assets/fonts/avenir.woff2') format('woff2');
+  font-weight: normal;
   font-style: normal;
 }
+
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

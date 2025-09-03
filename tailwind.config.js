@@ -1,12 +1,11 @@
-// tailwind.config.js
 export default {
-    theme: {
-      extend: {
-        fontFamily: {
-          myfont: ['avenir'],
-        },
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      fontFamily: {
+        avenir: ["Avenir", "sans-serif"],
       },
     },
-    plugins: [],
-  };
-  
+  },
+  plugins: [],
+};
