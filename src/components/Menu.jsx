@@ -40,7 +40,7 @@ export default function Menu({ visibleSubs }) {
         <div key={index} className="relative">
           {/* Main Menu */}
           <div className="flex  text-gray-200 font-avenir items-center relative">
-            <div className="relative w-max">
+            <div className="relative md:w-max   ">
               <Lottie
                 animationData={dustAnimation}
                 loop={false}
@@ -48,7 +48,7 @@ export default function Menu({ visibleSubs }) {
                 style={{ width: 120, height: 120 }}
               />
               <motion.span
-                className="font-avenir md:pl-0 pl-4 text-[14px] border-b-2 border-white/90 relative z-10"
+                className="font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px]  border-b-2 border-white/90 relative z-10"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
@@ -102,7 +102,7 @@ export default function Menu({ visibleSubs }) {
         </div>
       ))}
 
-      <div className="relative w-max md:hidden ">
+      <div className="relative md:w-max md:hidden ">
         <Lottie
           animationData={dustAnimation}
           loop={false}
@@ -110,7 +110,7 @@ export default function Menu({ visibleSubs }) {
           style={{ width: 120, height: 120 }}
         />
         <motion.span
-          className="font-avenir text-white md:pl-0 pl-4 text-[14px] border-b-2 border-white/90 relative z-10"
+          className="font-avenir text-white inline-block md:w-max w-[150px]  md:pl-0 pl-4 text-[14px] border-b-2  border-white/90 relative z-10"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
@@ -119,7 +119,7 @@ export default function Menu({ visibleSubs }) {
         </motion.span>
 
         <motion.div
-          className="text-sm relative w-max flex items-center text-gray-300  px-2"
+          className="text-sm relative flex items-center text-gray-300  px-2"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
