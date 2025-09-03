@@ -32,10 +32,18 @@ export default function VideoBackground({ scroll }) {
   });
 
   return (
-    <mesh ref={meshRef} scale={scale} position={[0, 0, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
-    </mesh>
-  );
+    <>
+      {/* Background video */}
+      <mesh ref={meshRef} scale={scale} position={[0, 0, 1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      </mesh>
 
+      {/* Black overlay plane */}
+      <mesh scale={scale} position={[0, 0, 1.01]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial color="black" transparent opacity={0.4} />
+      </mesh>
+    </>
+  );
 }
