@@ -9,7 +9,6 @@ import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 
-
 const MENUS = [
   { name: "THE WINDOW", sub: ["The Founder", "Joined Forces", "The Systems"] },
   {
@@ -26,7 +25,6 @@ const MENUS = [
 
 export default function Scene() {
   const scroll = useScroll();
-  const [visibleMenus, setVisibleMenus] = useState(-1);
   const [visibleSubs, setVisibleSubs] = useState(-1);
 
   useEffect(() => {
@@ -38,14 +36,10 @@ export default function Scene() {
       const totalSubs = MENUS.reduce((sum, m) => sum + m.sub.length, 0);
       const totalItems = totalMenus + totalSubs;
 
-      // map progress to totalItems
+      // Map progress to items
       const currentIndex = Math.floor(progress * totalItems);
 
-      // update visible menus
-      const menuIndex = Math.min(currentIndex, totalMenus - 1);
-      setVisibleMenus(menuIndex);
-
-      // update visible submenus (start after all menus are visible)
+      // ✅ Submenus reveal progressively after menus
       const subIndex = currentIndex - totalMenus;
       setVisibleSubs(subIndex);
     };
@@ -62,56 +56,52 @@ export default function Scene() {
 
   return (
     <>
-      <Html fullscreen>
+      <Html fullscreen className="fixed">
         <div className="absolute font-semibold top-0 left-1/4 w-1/2 ml-auto mr-auto flex justify-between p-4">
           {MENUS.map((item, index) => (
             <div key={index} className="relative">
-              {/* Main Menus */}
-              {index <= visibleMenus ? (
-                <>
-                  <Lottie
-                    animationData={dustAnimation}
-                    loop={false}
-                    className="absolute"
-                    style={{ width: 120, height: 120 }}
-                  />
-                  <motion.span
-                    className="text-gray-200 font-avenir text-[18px] border-b border-white"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 }}
-                  >
-                    {item.name}
-                  </motion.span>
+              {/* Main Menu */}
+              <div className="flex items-center">
+                <Lottie
+                  animationData={dustAnimation}
+                  loop={false}
+                  className="absolute"
+                  style={{ width: 120, height: 120 }}
+                />
+                <motion.span
+                  className="text-gray-200 font-avenir text-[18px] border-b border-white"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  {item.name}
+                </motion.span>
+              </div>
 
-                  {/* Submenus appear progressively on scroll */}
-                  <div className="flex flex-col p-1 pl-4 mt-2">
-                    {item.sub.map((subItem, subIdx) => {
-                      const globalSubIndex = subCounter++;
-                      return globalSubIndex <= visibleSubs ? (
-                        <motion.div
-                          key={subIdx}
-                          className="text-sm w-max flex items-center text-gray-300 py-1 px-2"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 }}
-                        >
-                          <Lottie
-                            animationData={dustAnimation}
-                            loop={false}
-                            style={{ width: 20, height: 20, marginRight: 8 }}
-                          />
-                          <div>{subItem}</div>
-                        </motion.div>
-                      ) : null;
-                    })}
-                  </div>
-                </>
-              ) : null}
+              {/* Submenus appear progressively on scroll */}
+              <div className="flex flex-col p-1 pl-4 mt-2">
+                {item.sub.map((subItem, subIdx) => {
+                  const globalSubIndex = subCounter++;
+                  return globalSubIndex <= visibleSubs ? (
+                    <motion.div
+                      key={subIdx}
+                      className="text-sm w-max flex items-center text-gray-300 py-1 px-2"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <Lottie
+                        animationData={dustAnimation}
+                        loop={false}
+                        style={{ width: 20, height: 20, marginRight: 8 }}
+                      />
+                      <div>{subItem}</div>
+                    </motion.div>
+                  ) : null;
+                })}
+              </div>
             </div>
           ))}
-
-
         </div>
       </Html>
 
