@@ -46,7 +46,7 @@ export default function Menu({ visibleSubs }) {
                     <div className="flex flex-col p-1 pl-4 mt-2">
                         {item.sub.map((subItem, subIdx) => {
                             const globalSubIndex = subCounter++;
-                            return globalSubIndex <= visibleSubs ? (
+                            return globalSubIndex < visibleSubs ? (
                                 <motion.div
                                     key={subIdx}
                                     className="text-sm relative w-max flex items-center text-gray-300 py-1 px-2"

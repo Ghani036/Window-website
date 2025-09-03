@@ -30,7 +30,7 @@ function Experience({ setVisibleSubs }) {
 }
 
 export default function App() {
-  const [visibleSubs, setVisibleSubs] = useState(1);
+  const [visibleSubs, setVisibleSubs] = useState(0);
 
   return (
     <div className="w-screen h-screen relative">
