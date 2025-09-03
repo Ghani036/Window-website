@@ -33,7 +33,7 @@ export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
 
   return (
-    <div className="w-screen h-screen relative">
+    <div className="w-screen h-screen relative custom-bg  ">
       <Menu visibleSubs={visibleSubs} />
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
@@ -44,6 +44,7 @@ export default function App() {
           <Experience setVisibleSubs={setVisibleSubs} />
         </ScrollControls>
       </Canvas>
+
     </div>
   );
 }

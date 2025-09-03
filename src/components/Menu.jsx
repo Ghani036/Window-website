@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import dustAnimation from "../assets/lottie/dust.json";
+import Spline from "@splinetool/react-spline";
 
 const MENUS = [
     { name: "THE WINDOW", sub: ["The Founder", "Joined Forces", "The Systems"] },
@@ -26,6 +27,7 @@ export default function Menu({ visibleSubs }) {
                 <div key={index} className="relative">
                     {/* Main Menu */}
                     <div className="flex text-gray-200 font-avenir items-center">
+                      
                         <Lottie
                             animationData={dustAnimation}
                             loop={false}
