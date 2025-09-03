@@ -49,7 +49,7 @@ export default function Menu({ visibleSubs }) {
                             return globalSubIndex <= visibleSubs ? (
                                 <motion.div
                                     key={subIdx}
-                                    className="text-sm w-max flex items-center text-gray-300 py-1 px-2"
+                                    className="text-sm relative w-max flex items-center text-gray-300 py-1 px-2"
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.3 }}
@@ -57,7 +57,8 @@ export default function Menu({ visibleSubs }) {
                                     <Lottie
                                         animationData={dustAnimation}
                                         loop={false}
-                                        style={{ width: 20, height: 20, marginRight: 8 }}
+                                        className="absolute -top-2"
+                                        style={{ width: 120, height: 120 }}
                                     />
                                     <div>{subItem}</div>
                                 </motion.div>
