@@ -23,7 +23,8 @@ export default function Menu({ visibleSubs }) {
   return (
     <div
       className="
-      fixed font-semibold top-0 
+      fixed font-semibold md:top-0
+      top-24
       left-0 w-full 
       md:left-1/4 md:w-1/2 
       mx-auto 
@@ -101,6 +102,12 @@ export default function Menu({ visibleSubs }) {
           </div>
         </div>
       ))}
+
+      <div className="absolute left-0 -top-24 ">
+        <img src="/assets/menu.png" alt="Menu"
+          className="h-8 w-8"
+        />
+      </div>
 
       <div className="relative md:w-max md:hidden ">
         <Lottie
