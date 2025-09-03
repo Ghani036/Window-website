@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import dustAnimation from "../assets/lottie/dust.json";
@@ -19,6 +19,11 @@ const MENUS = [
 
 export default function Menu({ visibleSubs }) {
   let subCounter = 0;
+
+  const [menuOpen, setMenuOpen] = useState(true)
+
+
+  const toggleMenu = () => setMenuOpen((prev => !prev))
 
   return (
     <div
@@ -106,6 +111,7 @@ export default function Menu({ visibleSubs }) {
       <div className="absolute left-0 -top-24 ">
         <img src="/assets/menu.png" alt="Menu"
           className="h-8 w-8"
+          onClick={() => toggleMenu()}
         />
       </div>
 
