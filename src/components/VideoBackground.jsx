@@ -5,10 +5,9 @@ import { smoothstepRange } from "../utils/smoothstep";
 
 export default function VideoBackground({ scroll }) {
   const texture = useVideoTexture("/videos/section-1-bg.mp4", {
-    start: false,
-    loop: false,
+    start: true,
+    loop: true,
     muted: true,
-    pause: true,
     crossOrigin: "Anonymous",
   });
 
