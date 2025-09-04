@@ -17,13 +17,23 @@ const MENUS = [
   { name: "THE CHAMBER", sub: ["Art Piece", "Wear the myth"] },
 ];
 
-export default function Menu({ visibleSubs }) {
+export default function Menu({ visibleSubs, onMenuClick }) {
   let subCounter = 0;
 
   const [menuOpen, setMenuOpen] = useState(true)
 
-
   const toggleMenu = () => setMenuOpen((prev => !prev))
+
+  const handleClick = (key) => {
+    if (onMenuClick) {
+      onMenuClick(key);
+    }
+    
+    // Close menu on mobile after clicking
+    if (window.innerWidth < 768) {
+      setMenuOpen(false);
+    }
+  };
 
   return (
     <>
@@ -67,10 +77,10 @@ export default function Menu({ visibleSubs }) {
                   style={{ width: 120, height: 120 }}
                 />
                 <motion.span
-                  className="font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px]  border-b-2 border-white/90 relative z-10"
+                  className="font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px] cursor-pointer border-b-2 border-white/90 relative z-10"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-
+                  onClick={() => handleClick(item.name.toLowerCase().replace(/\s+/g, ""))}
                 >
                   {item.name}
                 </motion.span>
@@ -88,6 +98,7 @@ export default function Menu({ visibleSubs }) {
             >
               {item.sub.map((subItem, subIdx) => {
                 const globalSubIndex = subCounter++;
+                const subKey = subItem.toLowerCase().replace(/\s+/g, "");
                 return globalSubIndex < visibleSubs ? (
                   <motion.div
                     key={subIdx}
@@ -108,6 +119,7 @@ export default function Menu({ visibleSubs }) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
+                        onClick={() => handleClick(subKey)}
                       >
                         - {subItem}
                       </motion.span>
@@ -135,6 +147,7 @@ export default function Menu({ visibleSubs }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
+            onClick={() => handleClick("contact")}
           >
             CONTACT
           </motion.span>

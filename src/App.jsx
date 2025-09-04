@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
 import Menu from "./components/Menu";
+import ContentOverlay from "./components/ContentOverlay";
 
 function Experience({ setVisibleSubs }) {
   const scroll = useScroll();
@@ -31,22 +32,36 @@ function Experience({ setVisibleSubs }) {
 
 export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
+  const [contentOverlay, setContentOverlay] = useState({ isVisible: false, sectionId: null });
+
+  const handleMenuClick = (sectionId) => {
+    setContentOverlay({ isVisible: true, sectionId });
+  };
+
+  const handleCloseOverlay = () => {
+    setContentOverlay({ isVisible: false, sectionId: null });
+  };
 
   return (
-    <div className="w-screen  h-screen relative custom-bg  ">
-
-      <div className=" bg-black/50 h-screen w-screen absolute " />
-      <Menu visibleSubs={visibleSubs} />
+    <div className="w-screen h-screen relative custom-bg">
+      <div className="bg-black/50 h-screen w-screen absolute" />
+      <Menu visibleSubs={visibleSubs} onMenuClick={handleMenuClick} />
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
         dpr={[1, 3]}
-        className="absolute  top-0 left-0 w-full h-full"
+        className="absolute top-0 left-0 w-full h-full"
       >
         <ScrollControls pages={15} damping={0.3}>
           <Experience setVisibleSubs={setVisibleSubs} />
         </ScrollControls>
       </Canvas>
-
+      
+      {/* Content Overlay */}
+      <ContentOverlay
+        isVisible={contentOverlay.isVisible}
+        sectionId={contentOverlay.sectionId}
+        onClose={handleCloseOverlay}
+      />
     </div>
   );
 }
