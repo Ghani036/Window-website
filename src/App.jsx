@@ -5,7 +5,7 @@ import Scene from "./components/Scene";
 import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
 
-function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection }) {
   const scroll = useScroll();
 
   useEffect(() => {
@@ -13,7 +13,19 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       const progress = scroll.offset;
       const totalSubs = 9;
       
+      // Handle going back to first section when scrolling up
+      if (progress < 0.1 && showContent) {
+        onBackToFirstSection();
+        return;
+      }
+      
       // Menu progression based on scroll
+      // Once all items are visible (visibleSubs >= 9), keep them visible
+      if (visibleSubs >= 9) {
+        setVisibleSubs(9);
+        return;
+      }
+      
       const firstSceneProgress = Math.min(progress / 0.5, 1);
       const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
       
@@ -23,7 +35,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
     scroll.el.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => scroll.el.removeEventListener("scroll", handleScroll);
-  }, [scroll, setVisibleSubs]);
+  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection]);
 
   const handleSectionReached = (sectionId) => {
     setCurrentSection(sectionId);
@@ -55,6 +67,19 @@ export default function App() {
     }
   };
 
+  const handleBackToFirstSection = () => {
+    setCurrentSection("thewindow");
+    setShowContent(false);
+    // Scroll back to top
+    const scrollElement = document.querySelector('.scroll-container');
+    if (scrollElement) {
+      scrollElement.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div className="relative w-screen min-h-screen custom-bg">
       <Menu 
@@ -72,6 +97,7 @@ export default function App() {
               currentSection={currentSection}
               showContent={showContent}
               visibleSubs={visibleSubs}
+              onBackToFirstSection={handleBackToFirstSection}
             />
           </ScrollControls>
         </Canvas>

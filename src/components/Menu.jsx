@@ -39,8 +39,10 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
   // Show all menu items when in any content section (not just thewindow)
   const isInContentSection = currentSection && currentSection !== "thewindow";
   
-  // Show all menu items when in content sections, otherwise use progressive reveal
-  const effectiveVisibleSubs = isInContentSection ? 9 : Math.max(1, visibleSubs);
+  // Show all menu items when:
+  // 1. In content sections, OR
+  // 2. All items are already visible (visibleSubs >= 9)
+  const effectiveVisibleSubs = (isInContentSection || visibleSubs >= 9) ? 9 : Math.max(1, visibleSubs);
 
   return (
     <>

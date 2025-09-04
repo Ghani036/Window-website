@@ -179,8 +179,6 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       </mesh>
 
 
-      {/* Content Background Panel */}
-
 
       {/* Title Text */}
       <Text
