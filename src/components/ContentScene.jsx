@@ -112,12 +112,12 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
     
     const progress = scroll.offset;
     
-    // Show content scene much later - after first scene is completely finished
-    // This prevents the blurry background issue
-    const shouldShow = progress > 0.15; // Show after 15% scroll (about 2+ pages)
+    // Show content scene immediately when first scene starts fading
+    // This prevents black background gaps
+    const shouldShow = progress > 0.15; // Show when first scene starts fading
     setIsVisible(shouldShow);
     
-    // Smooth fade in effect
+    // Smooth fade in effect - start immediately when first scene starts fading
     if (shouldShow) {
       const fadeProgress = Math.min(1, (progress - 0.15) / 0.05); // Fade in over 5% scroll
       setFadeIn(fadeProgress);
@@ -164,21 +164,21 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
   if (!isVisible) return null;
 
   return (
-    <group ref={contentRef} position={[0, 0, 0.5]}>
+    <group ref={contentRef} position={[0, 0, 0]}>
       {/* Content Background Video - Second background video for content sections */}
-      <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0]}>
+      <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0.9]}>
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={fadeIn} />
       </mesh>
 
-      {/* Dark overlay for content sections */}
-      <mesh scale={scale} position={[0, 0, 0.01]}>
+      {/* Dark overlay for content sections - very light overlay to show video */}
+      <mesh scale={scale} position={[0, 0, 0.91]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={0.3 * fadeIn} />
+        <meshBasicMaterial color="black" transparent opacity={0.1 * fadeIn} />
       </mesh>
 
       {/* Content Overlay */}
-      <mesh position={[0, 0, 0.01]}>
+      <mesh position={[0, 0, 0.92]}>
         <planeGeometry args={[viewport.width * 0.8, viewport.height * 0.6]} />
         <meshBasicMaterial 
           color="#000000" 
@@ -190,7 +190,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
       {/* Content Text */}
       <Text
         ref={titleRef}
-        position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.02]}
+        position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.93]}
         fontSize={0.15}
         color="#ffffff"
         anchorX="center"
@@ -206,7 +206,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
 
       <Text
         ref={contentTextRef}
-        position={[0, 0 + (1 - animationProgress) * 0.3, 0.02]}
+        position={[0, 0 + (1 - animationProgress) * 0.3, 0.93]}
         fontSize={0.08}
         color="#cccccc"
         anchorX="center"
@@ -222,7 +222,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
 
       <Text
         ref={descriptionRef}
-        position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.02]}
+        position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.93]}
         fontSize={0.06}
         color="#aaaaaa"
         anchorX="center"
@@ -237,17 +237,17 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
       </Text>
 
       {/* Decorative elements */}
-      <mesh position={[-0.3, 0.4, 0.02]}>
+      <mesh position={[-0.3, 0.4, 0.93]}>
         <sphereGeometry args={[0.02, 8, 8]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
       
-      <mesh position={[0.3, 0.4, 0.02]}>
+      <mesh position={[0.3, 0.4, 0.93]}>
         <sphereGeometry args={[0.02, 8, 8]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
-      <mesh position={[0, -0.4, 0.02]}>
+      <mesh position={[0, -0.4, 0.93]}>
         <sphereGeometry args={[0.02, 8, 8]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
@@ -259,7 +259,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
           position={[
             (Math.random() - 0.5) * 2,
             (Math.random() - 0.5) * 2,
-            (Math.random() - 0.5) * 0.5 + 0.02
+            (Math.random() - 0.5) * 0.5 + 0.93
           ]}
         >
           <sphereGeometry args={[0.005, 4, 4]} />

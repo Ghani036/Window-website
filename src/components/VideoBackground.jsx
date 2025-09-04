@@ -23,8 +23,8 @@ export default function VideoBackground({ scroll }) {
     // Phase 2: Steady state with subtle pulse
     const pulseZoom = 1.0 + 0.05 * Math.sin(t * Math.PI * 2);
 
-    // Phase 3: Fade out as we transition to content sections - much later
-    const fadeOut = Math.max(0, 1 - smoothstepRange(t, 0.1, 0.15));
+    // Phase 3: Keep first scene visible longer, fade out completely before second scene
+    const fadeOut = Math.max(0, 1 - smoothstepRange(t, 0.15, 0.20));
 
     const finalZoom = t < 0.15 ? zoomOut : pulseZoom;
 
@@ -46,7 +46,7 @@ export default function VideoBackground({ scroll }) {
       {/* Black overlay plane */}
       <mesh scale={scale} position={[0, 0, 1.01]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={0.4 * Math.max(0, 1 - smoothstepRange(scroll.offset, 0.1, 0.15))} />
+        <meshBasicMaterial color="black" transparent opacity={0.4 * Math.max(0, 1 - smoothstepRange(scroll.offset, 0.15, 0.20))} />
       </mesh>
     </>
   );

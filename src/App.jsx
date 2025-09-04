@@ -14,7 +14,7 @@ function Experience({ setVisibleSubs, setCurrentSection }) {
       const progress = scroll.offset;
       const totalSubs = 9;
       // Fix menu progression: show items progressively as we scroll through first scene
-      // First scene should be about 2+ pages (15% of 15 pages)
+      // First scene should be about 1.5+ pages (15% of 15 pages)
       const firstSceneProgress = Math.min(progress / 0.15, 1); // Normalize to 0-1 for first scene
       const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
       
@@ -61,7 +61,7 @@ export default function App() {
       />
 
       <div className="relative w-full h-screen">
-        <div className="bg-black/50 h-screen w-screen absolute" />
+        <div className="bg-black h-screen w-screen absolute" />
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
           <ScrollControls pages={15} damping={0.3}>
             <Experience 
