@@ -17,16 +17,21 @@ export default function VideoBackground({ scroll }) {
   useFrame(() => {
     const t = scroll.offset;
 
-    // Phase 1: Zoom out
-    const zoomOut = 1.2 - 0.2 * smoothstepRange(t, 0, 0.2);
+    // Phase 1: Initial zoom out (first scene completion)
+    const zoomOut = 1.2 - 0.2 * smoothstepRange(t, 0, 0.15);
 
-    // Phase 2: Pulse zoom
-    const pulseZoom = 1.0 + 0.1 * Math.sin(t * Math.PI * 2);
+    // Phase 2: Steady state with subtle pulse
+    const pulseZoom = 1.0 + 0.05 * Math.sin(t * Math.PI * 2);
 
-    const finalZoom = t < 0.2 ? zoomOut : pulseZoom;
+    // Phase 3: Fade out as we transition to content sections
+    const fadeOut = Math.max(0, 1 - smoothstepRange(t, 0.05, 0.067));
+
+    const finalZoom = t < 0.15 ? zoomOut : pulseZoom;
 
     if (meshRef.current) {
       meshRef.current.scale.set(scale[0] * finalZoom, scale[1] * finalZoom, 1);
+      // Fade out the first scene as we transition to content sections
+      meshRef.current.material.opacity = fadeOut;
     }
   });
 
@@ -35,13 +40,13 @@ export default function VideoBackground({ scroll }) {
       {/* Background video */}
       <mesh ref={meshRef} scale={scale} position={[0, 0, 1]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
+        <meshBasicMaterial map={texture} toneMapped={false} transparent />
       </mesh>
 
       {/* Black overlay plane */}
       <mesh scale={scale} position={[0, 0, 1.01]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={0.4} />
+        <meshBasicMaterial color="black" transparent opacity={0.4 * Math.max(0, 1 - smoothstepRange(scroll.offset, 0.05, 0.067))} />
       </mesh>
     </>
   );

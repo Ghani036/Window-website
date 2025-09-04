@@ -88,6 +88,8 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
   const { viewport } = useThree();
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [fadeIn, setFadeIn] = useState(0);
   const contentRef = useRef();
   const titleRef = useRef();
   const contentTextRef = useRef();
@@ -109,7 +111,25 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
     if (!scroll) return;
     
     const progress = scroll.offset;
-    const sectionIndex = Math.floor(progress * CONTENT_SECTIONS.length);
+    
+    // Show content scene after the first section (thewindow) - around 1 page scroll
+    // This ensures smooth transition from first scene to content sections
+    const shouldShow = progress > 0.067; // Show after 6.7% scroll (1 page of 15)
+    setIsVisible(shouldShow);
+    
+    // Smooth fade in effect
+    if (shouldShow) {
+      const fadeProgress = Math.min(1, (progress - 0.067) / 0.02); // Fade in over 2% scroll
+      setFadeIn(fadeProgress);
+    } else {
+      setFadeIn(0);
+    }
+    
+    if (!shouldShow) return;
+    
+    // Adjust progress to start from 0 when content becomes visible
+    const adjustedProgress = Math.max(0, (progress - 0.067) / 0.933);
+    const sectionIndex = Math.floor(adjustedProgress * CONTENT_SECTIONS.length);
     const clampedIndex = Math.min(sectionIndex, CONTENT_SECTIONS.length - 1);
     
     if (clampedIndex !== currentSectionIndex) {
@@ -132,7 +152,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
 
     // Animate video background
     if (videoMeshRef.current) {
-      const t = progress;
+      const t = adjustedProgress;
       const zoom = 1.0 + 0.1 * Math.sin(t * Math.PI * 2);
       videoMeshRef.current.scale.set(scale[0] * zoom, scale[1] * zoom, 1);
     }
@@ -140,12 +160,21 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
 
   const currentSection = CONTENT_SECTIONS[currentSectionIndex];
 
+  // Don't render if not visible
+  if (!isVisible) return null;
+
   return (
     <group ref={contentRef} position={[0, 0, 0.5]}>
-      {/* Content Background Video */}
+      {/* Content Background Video - Second background video for content sections */}
       <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={contentTexture} toneMapped={false} />
+        <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={fadeIn} />
+      </mesh>
+
+      {/* Dark overlay for content sections */}
+      <mesh scale={scale} position={[0, 0, 0.01]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial color="black" transparent opacity={0.3 * fadeIn} />
       </mesh>
 
       {/* Content Overlay */}
@@ -154,7 +183,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
         <meshBasicMaterial 
           color="#000000" 
           transparent 
-          opacity={0.6 * animationProgress}
+          opacity={0.6 * animationProgress * fadeIn}
         />
       </mesh>
 
@@ -170,7 +199,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
         maxWidth={viewport.width * 0.7}
         textAlign="center"
         fontFamily="Avenir, sans-serif"
-        opacity={animationProgress}
+        opacity={animationProgress * fadeIn}
       >
         {currentSection.title}
       </Text>
@@ -186,7 +215,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
         maxWidth={viewport.width * 0.6}
         textAlign="center"
         fontFamily="Avenir, sans-serif"
-        opacity={animationProgress * 0.9}
+        opacity={animationProgress * 0.9 * fadeIn}
       >
         {currentSection.content}
       </Text>
@@ -202,7 +231,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
         maxWidth={viewport.width * 0.5}
         textAlign="center"
         fontFamily="Avenir, sans-serif"
-        opacity={animationProgress * 0.8}
+        opacity={animationProgress * 0.8 * fadeIn}
       >
         {currentSection.description}
       </Text>
@@ -210,17 +239,17 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
       {/* Decorative elements */}
       <mesh position={[-0.3, 0.4, 0.02]}>
         <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
       
       <mesh position={[0.3, 0.4, 0.02]}>
         <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
       <mesh position={[0, -0.4, 0.02]}>
         <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
       {/* Floating particles */}
@@ -237,7 +266,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
           <meshBasicMaterial 
             color="#ffffff" 
             transparent 
-            opacity={0.3 * animationProgress} 
+            opacity={0.3 * animationProgress * fadeIn} 
           />
         </mesh>
       ))}

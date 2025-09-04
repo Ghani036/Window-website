@@ -17,7 +17,7 @@ const MENUS = [
   { name: "THE CHAMBER", sub: ["Art Piece", "Wear the myth"] },
 ];
 
-export default function Menu({ visibleSubs, onMenuClick }) {
+export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
   let subCounter = 0;
 
   const [menuOpen, setMenuOpen] = useState(true)
@@ -34,6 +34,13 @@ export default function Menu({ visibleSubs, onMenuClick }) {
       setMenuOpen(false);
     }
   };
+
+  // Determine if we're in section two (content sections)
+  // Show all menu items when in any content section (not just thewindow)
+  const isInContentSection = currentSection && currentSection !== "thewindow";
+  
+  // Show all menu items when in content sections, otherwise use progressive reveal
+  const effectiveVisibleSubs = isInContentSection ? 9 : Math.max(1, visibleSubs);
 
   return (
     <>
@@ -99,7 +106,7 @@ export default function Menu({ visibleSubs, onMenuClick }) {
               {item.sub.map((subItem, subIdx) => {
                 const globalSubIndex = subCounter++;
                 const subKey = subItem.toLowerCase().replace(/\s+/g, "");
-                return globalSubIndex < visibleSubs ? (
+                return globalSubIndex < effectiveVisibleSubs ? (
                   <motion.div
                     key={subIdx}
                     className="text-sm relative w-max flex items-center text-gray-300  px-2"

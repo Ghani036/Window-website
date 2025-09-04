@@ -1,7 +1,4 @@
 import React from "react";
-import { Canvas } from "@react-three/fiber";
-import ContentScene3D from "./ContentScene3D";
-import { ScrollControls } from "@react-three/drei";
 
 const SECTIONS = [
   { id: "thewindow", title: "THE WINDOW" },
@@ -22,15 +19,6 @@ const SECTIONS = [
 export default function ContentPage() {
   return (
     <div className="relative w-full">
-      {/* Seamless 3D background for all sections */}
-      <div className="pointer-events-none fixed top-0 left-0 w-full h-full ">
-        <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]}>
-          <ScrollControls pages={15} damping={0.3}>
-            <ContentScene3D />
-          </ScrollControls>
-        </Canvas>
-      </div>
-
       {SECTIONS.map((s) => (
         <section
           key={s.id}
