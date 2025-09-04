@@ -3,27 +3,21 @@ import { Canvas } from "@react-three/fiber";
 import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
 import Menu from "./components/Menu";
-import ContentOverlay from "./components/ContentOverlay";
+import ContentPage from "./components/ContentPage";
 
 function Experience({ setVisibleSubs }) {
   const scroll = useScroll();
 
   useEffect(() => {
     const handleScroll = () => {
-      // Get scroll progress (0 → 1)
       const progress = scroll.offset;
-
-      // Map scroll progress to number of visible submenus
-      // Example: If total subs = 9, show gradually
-      const totalSubs = 9; // count all sub-items in Menu
+      const totalSubs = 9;
       const newVisibleSubs = Math.floor(progress * totalSubs) + 1;
-
       setVisibleSubs(newVisibleSubs);
     };
 
-    // Listen every frame
     scroll.el.addEventListener("scroll", handleScroll);
-
+    handleScroll();
     return () => scroll.el.removeEventListener("scroll", handleScroll);
   }, [scroll, setVisibleSubs]);
 
@@ -32,36 +26,31 @@ function Experience({ setVisibleSubs }) {
 
 export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
-  const [contentOverlay, setContentOverlay] = useState({ isVisible: false, sectionId: null });
+
+  const MENU_OFFSET = 96; // px offset for fixed menu if needed
 
   const handleMenuClick = (sectionId) => {
-    setContentOverlay({ isVisible: true, sectionId });
-  };
-
-  const handleCloseOverlay = () => {
-    setContentOverlay({ isVisible: false, sectionId: null });
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const targetTop = rect.top + window.scrollY - MENU_OFFSET;
+    window.scrollTo({ top: targetTop, behavior: "smooth" });
   };
 
   return (
-    <div className="w-screen h-screen relative custom-bg">
-      <div className="bg-black/50 h-screen w-screen absolute" />
+    <div className="relative w-screen min-h-screen custom-bg">
       <Menu visibleSubs={visibleSubs} onMenuClick={handleMenuClick} />
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 75 }}
-        dpr={[1, 3]}
-        className="absolute top-0 left-0 w-full h-full"
-      >
-        <ScrollControls pages={15} damping={0.3}>
-          <Experience setVisibleSubs={setVisibleSubs} />
-        </ScrollControls>
-      </Canvas>
-      
-      {/* Content Overlay */}
-      <ContentOverlay
-        isVisible={contentOverlay.isVisible}
-        sectionId={contentOverlay.sectionId}
-        onClose={handleCloseOverlay}
-      />
+
+      <div className="relative w-full h-screen">
+        <div className="bg-black/50 h-screen w-screen absolute" />
+        <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
+          <ScrollControls pages={15} damping={0.3}>
+            <Experience setVisibleSubs={setVisibleSubs} />
+          </ScrollControls>
+        </Canvas>
+      </div>
+
+      <ContentPage />
     </div>
   );
 }

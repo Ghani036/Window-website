@@ -98,7 +98,7 @@ export default function ContentOverlay({ isVisible, sectionId, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className="fixed  inset-0 z-50 flex items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -115,7 +115,7 @@ export default function ContentOverlay({ isVisible, sectionId, onClose }) {
 
         {/* Content container */}
         <motion.div
-          className="relative max-w-4xl mx-auto px-8 text-center z-10"
+          className="relative w-full h-screen max-w-4xl mx-auto px-8 text-center z-10"
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
