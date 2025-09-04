@@ -1,4 +1,7 @@
 import React from "react";
+import { Canvas } from "@react-three/fiber";
+import ContentScene3D from "./ContentScene3D";
+import { ScrollControls } from "@react-three/drei";
 
 const SECTIONS = [
   { id: "thewindow", title: "THE WINDOW" },
@@ -19,23 +22,23 @@ const SECTIONS = [
 export default function ContentPage() {
   return (
     <div className="relative w-full">
+      {/* Seamless 3D background for all sections */}
+      <div className="pointer-events-none fixed top-0 left-0 w-full h-full ">
+        <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]}>
+          <ScrollControls pages={15} damping={0.3}>
+            <ContentScene3D />
+          </ScrollControls>
+        </Canvas>
+      </div>
+
       {SECTIONS.map((s) => (
         <section
           key={s.id}
           id={s.id}
           className="min-h-screen w-full relative flex items-center justify-center"
         >
-          {/* Consistent Background video for all sections */}
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-          >
-            <source src="/videos/section-2-bg.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-black/60" />
+          {/* Match hero overlay look */}
+          <div className="absolute inset-0 bg-black/55" />
 
           <div className="relative z-10 w-full max-w-4xl mx-auto px-8 text-center py-24">
             <h2 className="text-5xl md:text-7xl font-avenir text-white tracking-wide mb-6">{s.title}</h2>
@@ -63,8 +66,8 @@ export default function ContentPage() {
             <div className="mt-10 text-gray-200/80">
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer euismod, nunc quis
-                bibendum dictum, risus sem tincidunt odio, vitae luctus nisi eros a erat. Proin id
-                magna mi. Donec sed sapien sed nulla interdum porttitor at et lectus.
+                bibendum dictum, risus sem tincidunt odio, vitae luctus nisi eros a erat. Proin id magna
+                mi. Donec sed sapien sed nulla interdum porttitor at et lectus.
               </p>
             </div>
           </div>
