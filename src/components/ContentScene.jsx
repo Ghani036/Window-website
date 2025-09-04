@@ -112,14 +112,14 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
     
     const progress = scroll.offset;
     
-    // Show content scene after the first section (thewindow) - around 1 page scroll
-    // This ensures smooth transition from first scene to content sections
-    const shouldShow = progress > 0.067; // Show after 6.7% scroll (1 page of 15)
+    // Show content scene much later - after first scene is completely finished
+    // This prevents the blurry background issue
+    const shouldShow = progress > 0.15; // Show after 15% scroll (about 2+ pages)
     setIsVisible(shouldShow);
     
     // Smooth fade in effect
     if (shouldShow) {
-      const fadeProgress = Math.min(1, (progress - 0.067) / 0.02); // Fade in over 2% scroll
+      const fadeProgress = Math.min(1, (progress - 0.15) / 0.05); // Fade in over 5% scroll
       setFadeIn(fadeProgress);
     } else {
       setFadeIn(0);
@@ -128,7 +128,7 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
     if (!shouldShow) return;
     
     // Adjust progress to start from 0 when content becomes visible
-    const adjustedProgress = Math.max(0, (progress - 0.067) / 0.933);
+    const adjustedProgress = Math.max(0, (progress - 0.15) / 0.85);
     const sectionIndex = Math.floor(adjustedProgress * CONTENT_SECTIONS.length);
     const clampedIndex = Math.min(sectionIndex, CONTENT_SECTIONS.length - 1);
     

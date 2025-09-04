@@ -14,12 +14,9 @@ function Experience({ setVisibleSubs, setCurrentSection }) {
       const progress = scroll.offset;
       const totalSubs = 9;
       // Fix menu progression: show items progressively as we scroll through first scene
-      // First scene should be about 1 page (6.67% of 15 pages)
-      const firstSceneProgress = Math.min(progress / 0.067, 1); // Normalize to 0-1 for first scene
+      // First scene should be about 2+ pages (15% of 15 pages)
+      const firstSceneProgress = Math.min(progress / 0.15, 1); // Normalize to 0-1 for first scene
       const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
-      
-      // Debug logging
-      console.log(`Scroll: ${(progress * 100).toFixed(1)}%, First Scene Progress: ${(firstSceneProgress * 100).toFixed(1)}%, Visible Subs: ${newVisibleSubs}`);
       
       setVisibleSubs(newVisibleSubs);
     };
