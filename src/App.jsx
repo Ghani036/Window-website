@@ -61,7 +61,7 @@ export default function App() {
       />
 
       <div className="relative w-full h-screen">
-        <div className="bg-black h-screen w-screen absolute" />
+        <div className=" h-screen w-screen absolute" />
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
           <ScrollControls pages={15} damping={0.3}>
             <Experience 
