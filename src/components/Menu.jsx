@@ -17,7 +17,7 @@ const MENUS = [
   { name: "THE CHAMBER", sub: ["Art Piece", "Wear the myth"] },
 ];
 
-export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
+export default function Menu({ visibleSubs, onMenuClick, currentSection, isTransitioning }) {
   let subCounter = 0;
 
   const [menuOpen, setMenuOpen] = useState(true)
@@ -25,7 +25,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
   const toggleMenu = () => setMenuOpen((prev => !prev))
 
   const handleClick = (key) => {
-    if (onMenuClick) {
+    if (onMenuClick && !isTransitioning) {
       onMenuClick(key);
     }
     
@@ -86,9 +86,12 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
                   style={{ width: 120, height: 120 }}
                 />
                 <motion.span
-                  className="font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px] cursor-pointer border-b-2 border-white/90 relative z-10"
+                  className={`font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px] cursor-pointer border-b-2 border-white/90 relative z-10 transition-all duration-300 ${
+                    isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+                  }`}
                   initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: isTransitioning ? 0.5 : 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                   onClick={() => handleClick(item.name.toLowerCase().replace(/\s+/g, ""))}
                 >
                   {item.name}
@@ -124,10 +127,12 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection }) {
                         style={{ width: 120, height: 120 }}
                       />
                       <motion.span
-                        className=" relative z-10 pl-4 text-xs cursor-pointer"
+                        className={`relative z-10 pl-4 text-xs cursor-pointer transition-all duration-300 ${
+                          isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+                        }`}
                         initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
+                        animate={{ opacity: isTransitioning ? 0.5 : 1, y: 0 }}
+                        transition={{ delay: 0.7, duration: 0.3 }}
                         onClick={() => handleClick(subKey)}
                       >
                         - {subItem}

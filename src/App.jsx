@@ -5,7 +5,7 @@ import Scene from "./components/Scene";
 import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
 
-function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning }) {
   const scroll = useScroll();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       const totalSubs = 9;
       
       // Handle going back to first section when scrolling up
-      if (progress < 0.1 && showContent) {
+      if (progress < 0.05 && showContent) {
         onBackToFirstSection();
         return;
       }
@@ -44,7 +44,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
   return (
     <>
       <Scene showContent={showContent} visibleSubs={visibleSubs} />
-      <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} />
+      <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} isTransitioning={isTransitioning} />
     </>
   );
 }
@@ -53,31 +53,46 @@ export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
   const [currentSection, setCurrentSection] = useState("thewindow");
   const [showContent, setShowContent] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleMenuClick = (sectionId) => {
-    setCurrentSection(sectionId);
-    setShowContent(true);
-    // Scroll to show content section
-    const scrollElement = document.querySelector('.scroll-container');
-    if (scrollElement) {
-      scrollElement.scrollTo({
-        top: scrollElement.scrollHeight * 0.6, // Scroll to show content
-        behavior: 'smooth'
-      });
-    }
+    // Start transition
+    setIsTransitioning(true);
+    
+    // Change content after a brief delay for smooth transition
+    setTimeout(() => {
+      setCurrentSection(sectionId);
+      setShowContent(true);
+      setIsTransitioning(false);
+      
+      // Scroll to show content section
+      const scrollElement = document.querySelector('.scroll-container');
+      if (scrollElement) {
+        scrollElement.scrollTo({
+          top: scrollElement.scrollHeight * 0.6, // Scroll to show content
+          behavior: 'smooth'
+        });
+      }
+    }, 200); // 200ms transition delay
   };
 
   const handleBackToFirstSection = () => {
-    setCurrentSection("thewindow");
-    setShowContent(false);
-    // Scroll back to top
-    const scrollElement = document.querySelector('.scroll-container');
-    if (scrollElement) {
-      scrollElement.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      setCurrentSection("thewindow");
+      setShowContent(false);
+      setIsTransitioning(false);
+      
+      // Scroll back to top
+      const scrollElement = document.querySelector('.scroll-container');
+      if (scrollElement) {
+        scrollElement.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }, 200);
   };
 
   return (
@@ -86,6 +101,7 @@ export default function App() {
         visibleSubs={visibleSubs} 
         onMenuClick={handleMenuClick}
         currentSection={currentSection}
+        isTransitioning={isTransitioning}
       />
 
       <div className="relative w-full h-screen scroll-container">
@@ -98,6 +114,7 @@ export default function App() {
               showContent={showContent}
               visibleSubs={visibleSubs}
               onBackToFirstSection={handleBackToFirstSection}
+              isTransitioning={isTransitioning}
             />
           </ScrollControls>
         </Canvas>

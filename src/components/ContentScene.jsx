@@ -84,7 +84,7 @@ const CONTENT_SECTIONS = [
   }
 ];
 
-export default function ContentScene({ scroll, onSectionReached, currentSection, showContent, visibleSubs }) {
+export default function ContentScene({ scroll, onSectionReached, currentSection, showContent, visibleSubs, isTransitioning }) {
   const { viewport } = useThree();
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -104,6 +104,13 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
   // Find current section data
   const currentSectionData = CONTENT_SECTIONS.find(section => section.id === currentSection) || CONTENT_SECTIONS[0];
+  
+  // Reset animation when section changes
+  React.useEffect(() => {
+    if (isTransitioning) {
+      setAnimationProgress(0);
+    }
+  }, [currentSection, isTransitioning]);
 
   // Calculate visibility and animations based on scroll and menu clicks
   useFrame((state) => {
@@ -137,9 +144,10 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
     if (!shouldShow) return;
 
-    // Animate content appearance
+    // Animate content appearance (faster during transitions)
     if (animationProgress < 1) {
-      setAnimationProgress(prev => Math.min(prev + 0.02, 1));
+      const speed = isTransitioning ? 0.05 : 0.02;
+      setAnimationProgress(prev => Math.min(prev + speed, 1));
     }
 
     // Add 3D floating animation
