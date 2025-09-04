@@ -4,18 +4,17 @@ import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
 import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
-import ContentPage from "./components/ContentPage";
 
-function Experience({ setVisibleSubs, setCurrentSection }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs }) {
   const scroll = useScroll();
 
   useEffect(() => {
     const handleScroll = () => {
       const progress = scroll.offset;
       const totalSubs = 9;
-      // Fix menu progression: show items progressively as we scroll through first scene
-      // First scene should be about 1.5+ pages (15% of 15 pages)
-      const firstSceneProgress = Math.min(progress / 0.15, 1); // Normalize to 0-1 for first scene
+      
+      // Menu progression based on scroll
+      const firstSceneProgress = Math.min(progress / 0.5, 1);
       const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
       
       setVisibleSubs(newVisibleSubs);
@@ -32,8 +31,8 @@ function Experience({ setVisibleSubs, setCurrentSection }) {
 
   return (
     <>
-      <Scene />
-      <ContentScene scroll={scroll} onSectionReached={handleSectionReached} />
+      <Scene showContent={showContent} visibleSubs={visibleSubs} />
+      <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} />
     </>
   );
 }
@@ -41,15 +40,19 @@ function Experience({ setVisibleSubs, setCurrentSection }) {
 export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
   const [currentSection, setCurrentSection] = useState("thewindow");
-
-  const MENU_OFFSET = 96; // px offset for fixed menu if needed
+  const [showContent, setShowContent] = useState(false);
 
   const handleMenuClick = (sectionId) => {
-    const el = document.getElementById(sectionId);
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const targetTop = rect.top + window.scrollY - MENU_OFFSET;
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+    setCurrentSection(sectionId);
+    setShowContent(true);
+    // Scroll to show content section
+    const scrollElement = document.querySelector('.scroll-container');
+    if (scrollElement) {
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight * 0.6, // Scroll to show content
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -60,19 +63,19 @@ export default function App() {
         currentSection={currentSection}
       />
 
-      <div className="relative w-full h-screen">
-        <div className=" h-screen w-screen absolute" />
+      <div className="relative w-full h-screen scroll-container">
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
           <ScrollControls pages={15} damping={0.3}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 
               setCurrentSection={setCurrentSection}
+              currentSection={currentSection}
+              showContent={showContent}
+              visibleSubs={visibleSubs}
             />
           </ScrollControls>
         </Canvas>
       </div>
-
-      <ContentPage />
     </div>
   );
 }

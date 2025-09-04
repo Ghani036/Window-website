@@ -6,12 +6,12 @@ import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 
-export default function Scene() {
+export default function Scene({ showContent, visibleSubs }) {
   const scroll = useScroll();
 
   return (
     <>
-      <VideoBackground scroll={scroll} />
+      <VideoBackground scroll={scroll} showContent={showContent} visibleSubs={visibleSubs} />
       <LogoVideoHUD scroll={scroll} />
       <CameraRig scroll={scroll} />
       <StarField scroll={scroll} />

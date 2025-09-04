@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useVideoTexture, useAspect, Text } from "@react-three/drei";
 
@@ -84,18 +84,14 @@ const CONTENT_SECTIONS = [
   }
 ];
 
-export default function ContentScene({ scroll, targetSection, onSectionReached }) {
+export default function ContentScene({ scroll, onSectionReached, currentSection, showContent, visibleSubs }) {
   const { viewport } = useThree();
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [fadeIn, setFadeIn] = useState(0);
   const contentRef = useRef();
-  const titleRef = useRef();
-  const contentTextRef = useRef();
-  const descriptionRef = useRef();
 
-  // Use different video for content background
+  // Use second background video for content sections
   const contentTexture = useVideoTexture("/videos/section-2-bg.mp4", {
     start: true,
     loop: true,
@@ -106,170 +102,186 @@ export default function ContentScene({ scroll, targetSection, onSectionReached }
   const scale = useAspect(1920, 1080, 1);
   const videoMeshRef = useRef();
 
-  // Calculate which section should be active based on scroll
+  // Find current section data
+  const currentSectionData = CONTENT_SECTIONS.find(section => section.id === currentSection) || CONTENT_SECTIONS[0];
+
+  // Calculate visibility and animations based on scroll and menu clicks
   useFrame((state) => {
     if (!scroll) return;
-    
+
     const progress = scroll.offset;
-    
-    // Show content scene immediately when first scene starts fading
-    // This prevents black background gaps
-    const shouldShow = progress > 0.15; // Show when first scene starts fading
+
+    // Show content scene when:
+    // 1. Menu item is clicked (showContent = true)
+    // 2. All menu items are visible (visibleSubs >= 9)
+    // 3. Scrolled past 40% (earlier threshold)
+    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.4;
     setIsVisible(shouldShow);
-    
-    // Smooth fade in effect - start immediately when first scene starts fading
+
+    // Smooth fade in effect
     if (shouldShow) {
-      const fadeProgress = Math.min(1, (progress - 0.15) / 0.05); // Fade in over 5% scroll
-      setFadeIn(fadeProgress);
+      if (showContent) {
+        // If menu item was clicked, show immediately
+        setFadeIn(1);
+      } else if (visibleSubs >= 9) {
+        // If all menu items are visible, show content
+        setFadeIn(1);
+      } else {
+        // If scrolling, fade in gradually
+        const fadeProgress = Math.min(1, (progress - 0.4) / 0.2);
+        setFadeIn(fadeProgress);
+      }
     } else {
       setFadeIn(0);
     }
-    
+
     if (!shouldShow) return;
-    
-    // Adjust progress to start from 0 when content becomes visible
-    const adjustedProgress = Math.max(0, (progress - 0.15) / 0.85);
-    const sectionIndex = Math.floor(adjustedProgress * CONTENT_SECTIONS.length);
-    const clampedIndex = Math.min(sectionIndex, CONTENT_SECTIONS.length - 1);
-    
-    if (clampedIndex !== currentSectionIndex) {
-      setCurrentSectionIndex(clampedIndex);
-      setAnimationProgress(0); // Reset animation when section changes
-      if (onSectionReached) {
-        onSectionReached(CONTENT_SECTIONS[clampedIndex].id);
-      }
-    }
 
     // Animate content appearance
     if (animationProgress < 1) {
       setAnimationProgress(prev => Math.min(prev + 0.02, 1));
     }
 
-    // Add subtle floating animation
+    // Add 3D floating animation
     if (contentRef.current) {
       contentRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.02;
+      contentRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.01;
+      contentRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.4) * 0.01;
     }
 
-    // Animate video background
+    // Keep video background stable
     if (videoMeshRef.current) {
-      const t = adjustedProgress;
-      const zoom = 1.0 + 0.1 * Math.sin(t * Math.PI * 2);
-      videoMeshRef.current.scale.set(scale[0] * zoom, scale[1] * zoom, 1);
+      videoMeshRef.current.scale.set(scale[0], scale[1], 1);
+    }
+
+    // Notify parent of section change
+    if (onSectionReached && currentSection !== currentSectionData.id) {
+      onSectionReached(currentSectionData.id);
     }
   });
-
-  const currentSection = CONTENT_SECTIONS[currentSectionIndex];
 
   // Don't render if not visible
   if (!isVisible) return null;
 
   return (
     <group ref={contentRef} position={[0, 0, 0]}>
-      {/* Content Background Video - Second background video for content sections */}
+
+      {/* Background Video - Second video for content sections */}
       <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0.9]}>
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={fadeIn} />
       </mesh>
 
-      {/* Dark overlay for content sections - very light overlay to show video */}
+      {/* Black Overlay Layer */}
       <mesh scale={scale} position={[0, 0, 0.91]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={0.1 * fadeIn} />
+        <meshBasicMaterial color="black" transparent opacity={0.6 * fadeIn} />
       </mesh>
 
-      {/* Content Overlay */}
-      <mesh position={[0, 0, 0.92]}>
-        <planeGeometry args={[viewport.width * 0.8, viewport.height * 0.6]} />
-        <meshBasicMaterial 
-          color="#000000" 
-          transparent 
-          opacity={0.6 * animationProgress * fadeIn}
-        />
-      </mesh>
 
-      {/* Content Text */}
+      {/* Content Background Panel */}
+
+
+      {/* Title Text */}
       <Text
-        ref={titleRef}
-        position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.93]}
+        position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.94]}
         fontSize={0.15}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        font="/src/assets/fonts/avenir.woff2"
         maxWidth={viewport.width * 0.7}
         textAlign="center"
-        fontFamily="Avenir, sans-serif"
+        fontFamily="Arial, sans-serif"
         opacity={animationProgress * fadeIn}
       >
-        {currentSection.title}
+        {currentSectionData.title}
       </Text>
 
+      {/* Content Text */}
       <Text
-        ref={contentTextRef}
-        position={[0, 0 + (1 - animationProgress) * 0.3, 0.93]}
+        position={[0, 0 + (1 - animationProgress) * 0.3, 0.94]}
         fontSize={0.08}
         color="#cccccc"
         anchorX="center"
         anchorY="middle"
-        font="/src/assets/fonts/avenir.woff2"
         maxWidth={viewport.width * 0.6}
         textAlign="center"
-        fontFamily="Avenir, sans-serif"
+        fontFamily="Arial, sans-serif"
         opacity={animationProgress * 0.9 * fadeIn}
       >
-        {currentSection.content}
+        {currentSectionData.content}
       </Text>
 
+      {/* Description Text */}
       <Text
-        ref={descriptionRef}
-        position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.93]}
+        position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.94]}
         fontSize={0.06}
         color="#aaaaaa"
         anchorX="center"
         anchorY="middle"
-        font="/src/assets/fonts/avenir.woff2"
         maxWidth={viewport.width * 0.5}
         textAlign="center"
-        fontFamily="Avenir, sans-serif"
+        fontFamily="Arial, sans-serif"
         opacity={animationProgress * 0.8 * fadeIn}
       >
-        {currentSection.description}
+        {currentSectionData.description}
       </Text>
 
-      {/* Decorative elements */}
-      <mesh position={[-0.3, 0.4, 0.93]}>
-        <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
-      </mesh>
-      
-      <mesh position={[0.3, 0.4, 0.93]}>
+      {/* Decorative Elements */}
+      <mesh position={[-0.3, 0.4, 0.94]}>
         <sphereGeometry args={[0.02, 8, 8]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
-      <mesh position={[0, -0.4, 0.93]}>
+      <mesh position={[0.3, 0.4, 0.94]}>
         <sphereGeometry args={[0.02, 8, 8]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
-      {/* Floating particles */}
-      {Array.from({ length: 20 }).map((_, i) => (
+      <mesh position={[0, -0.4, 0.94]}>
+        <sphereGeometry args={[0.02, 8, 8]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
+      </mesh>
+
+      {/* Floating Particles */}
+      {Array.from({ length: 25 }).map((_, i) => (
         <mesh
           key={i}
           position={[
-            (Math.random() - 0.5) * 2,
-            (Math.random() - 0.5) * 2,
-            (Math.random() - 0.5) * 0.5 + 0.93
+            (Math.random() - 0.5) * 2.5,
+            (Math.random() - 0.5) * 2.5,
+            (Math.random() - 0.5) * 0.8 + 0.95
           ]}
         >
-          <sphereGeometry args={[0.005, 4, 4]} />
-          <meshBasicMaterial 
-            color="#ffffff" 
-            transparent 
-            opacity={0.3 * animationProgress * fadeIn} 
+          <sphereGeometry args={[0.003 + Math.random() * 0.004, 6, 6]} />
+          <meshBasicMaterial
+            color={i % 3 === 0 ? "#ffffff" : i % 3 === 1 ? "#4a9eff" : "#ff6b6b"}
+            transparent
+            opacity={0.4 * animationProgress * fadeIn}
           />
         </mesh>
       ))}
+
+      {/* 3D Corner Accents */}
+      <mesh position={[-0.4, 0.3, 0.95]}>
+        <boxGeometry args={[0.05, 0.05, 0.01]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
+      </mesh>
+
+      <mesh position={[0.4, 0.3, 0.95]}>
+        <boxGeometry args={[0.05, 0.05, 0.01]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
+      </mesh>
+
+      <mesh position={[-0.4, -0.3, 0.95]}>
+        <boxGeometry args={[0.05, 0.05, 0.01]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
+      </mesh>
+
+      <mesh position={[0.4, -0.3, 0.95]}>
+        <boxGeometry args={[0.05, 0.05, 0.01]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
+      </mesh>
     </group>
   );
 }

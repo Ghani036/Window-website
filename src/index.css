@@ -22,38 +22,18 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-/* Smooth scrolling for content sections */
+/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-.content-scroll-container {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.content-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-.content-scroll-container {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
 .custom-bg {
-  background-image: url('/assets/bg.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover; 
+  background-color: #000000;
 }
 
 body {
   margin: 0;
-  background-image: url('/assets/bg.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover; 
+  background-color: #000000;
   -ms-overflow-style: none;  
   scrollbar-width: none;    
 }
