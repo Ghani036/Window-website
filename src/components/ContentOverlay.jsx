@@ -12,8 +12,8 @@ const CONTENT_SECTIONS = [
   {
     id: "thefounder",
     title: "The Founder",
-    content: "Meet the visionary behind The Window's innovative approach to digital storytelling and immersive experiences.",
-    description: "Our founder brings years of experience in creative direction and technological innovation, driving our mission to push boundaries."
+    content: "A window of collaboration is more than a moment, it’s a chance to pause time, connect, and create something that lasts forever.",
+    description: "Hafid Maï, Founder & Creative Lead."
   },
   {
     id: "joinedforces",

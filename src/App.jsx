@@ -5,7 +5,7 @@ import Scene from "./components/Scene";
 import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
 
-function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent }) {
   const scroll = useScroll();
 
   useEffect(() => {
@@ -23,6 +23,10 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       // Once all items are visible (visibleSubs >= 9), keep them visible
       if (visibleSubs >= 9) {
         setVisibleSubs(9);
+        // Auto-transition to content section when all menu items are visible
+        if (!showContent && progress > 0.6) {
+          setShowContent(true);
+        }
         return;
       }
       
@@ -115,10 +119,12 @@ export default function App() {
               visibleSubs={visibleSubs}
               onBackToFirstSection={handleBackToFirstSection}
               isTransitioning={isTransitioning}
+              setShowContent={setShowContent}
             />
           </ScrollControls>
         </Canvas>
       </div>
+
     </div>
   );
 }

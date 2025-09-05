@@ -1,7 +1,10 @@
 import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useVideoTexture, useAspect, Text } from "@react-three/drei";
+import { useVideoTexture, useAspect, Text, Html } from "@react-three/drei";
 import ParticleSystem from "./ParticleSystem";
+import FloatingParticles from "./FloatingParticles";
+import StarField from "./StarField";
+import ContactForm from "./ContactForm";
 
 // Content sections data
 const CONTENT_SECTIONS = [
@@ -14,8 +17,8 @@ const CONTENT_SECTIONS = [
   {
     id: "thefounder",
     title: "The Founder",
-    content: "Meet the visionary behind The Window's innovative approach to digital storytelling and immersive experiences.",
-    description: "Our founder brings years of experience in creative direction and technological innovation, driving our mission to push boundaries."
+    content: "A window of collaboration is more than a moment, it’s a chance to pause time, connect, and create something that lasts forever.",
+    description: "Hafid Maï, Founder & Creative Lead."
   },
   {
     id: "joinedforces",
@@ -102,6 +105,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
   const scale = useAspect(1920, 1080, 1);
   const videoMeshRef = useRef();
+  const contentVideoRef = contentTexture.image; // Get the video element
 
   // Find current section data
   const currentSectionData = CONTENT_SECTIONS.find(section => section.id === currentSection) || CONTENT_SECTIONS[0];
@@ -118,6 +122,13 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     if (!scroll) return;
 
     const progress = scroll.offset;
+
+    // Control content video progress based on scroll (slight progress)
+    if (contentVideoRef && contentVideoRef.readyState >= 2 && contentVideoRef.duration) {
+      // Map scroll progress to video progress (0 to 0.3 of video duration for subtle effect)
+      const videoProgress = Math.min(progress * 0.3, 0.3);
+      contentVideoRef.currentTime = contentVideoRef.duration * videoProgress;
+    }
 
     // Show content scene when:
     // 1. Menu item is clicked (showContent = true)
@@ -144,6 +155,9 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     }
 
     if (!shouldShow) return;
+
+    // Content changes are handled by App.jsx, not here
+    // This prevents conflicts with the main scroll logic
 
     // Animate content appearance (faster during transitions)
     if (animationProgress < 1) {
@@ -187,60 +201,89 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         <meshBasicMaterial color="black" transparent opacity={0.6 * fadeIn} />
       </mesh>
 
+      {/* Star Field for Content Section */}
+      <StarField scroll={scroll} />
+
+      {/* Particle Systems for Content Section */}
       <ParticleSystem
         count={1200}
         scroll={scroll}
         showContent={showContent}
         visibleSubs={visibleSubs}
-        section="first"
+        section="content"
+      />
+      <FloatingParticles 
+        scroll={scroll} 
+        showContent={showContent} 
+        visibleSubs={visibleSubs}
+        section="content"
       />
 
 
 
-      {/* Title Text */}
-      <Text
-        position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.94]}
-        fontSize={0.15}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={viewport.width * 0.7}
-        textAlign="center"
-        fontFamily="Arial, sans-serif"
-        opacity={animationProgress * fadeIn}
-      >
-        {currentSectionData.title}
-      </Text>
+      {/* Conditional Content Rendering */}
+      {currentSection === "contact" ? (
+        // Contact Form
+        <Html
+          position={[0, 0, 0.95]}
+          transform
+          style={{
+            width: viewport.width * 0.8,
+            height: viewport.height * 0.8,
+            pointerEvents: 'auto',
+            opacity: animationProgress * fadeIn
+          }}
+        >
+          <ContactForm />
+        </Html>
+      ) : (
+        <>
+          {/* Title Text */}
+          <Text
+            position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.94]}
+            fontSize={0.15}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={viewport.width * 0.7}
+            textAlign="center"
+            fontFamily="Arial, sans-serif"
+            opacity={animationProgress * fadeIn}
+          >
+            {currentSectionData.title}
+          </Text>
 
-      {/* Content Text */}
-      <Text
-        position={[0, 0 + (1 - animationProgress) * 0.3, 0.94]}
-        fontSize={0.08}
-        color="#cccccc"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={viewport.width * 0.6}
-        textAlign="center"
-        fontFamily="Arial, sans-serif"
-        opacity={animationProgress * 0.9 * fadeIn}
-      >
-        {currentSectionData.content}
-      </Text>
+          {/* Content Text */}
+          <Text
+            position={[0, 0 + (1 - animationProgress) * 0.3, 0.94]}
+            fontSize={0.08}
+            color="#cccccc"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={viewport.width * 0.6}
+            textAlign="center"
+            fontFamily="Arial, sans-serif"
+            opacity={animationProgress * 0.9 * fadeIn}
+          >
+            {currentSectionData.content}
+          </Text>
 
-      {/* Description Text */}
-      <Text
-        position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.94]}
-        fontSize={0.06}
-        color="#aaaaaa"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={viewport.width * 0.5}
-        textAlign="center"
-        fontFamily="Arial, sans-serif"
-        opacity={animationProgress * 0.8 * fadeIn}
-      >
-        {currentSectionData.description}
-      </Text>
+          {/* Description Text */}
+          <Text
+            position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.94]}
+            fontSize={0.06}
+            color="#aaaaaa"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={viewport.width * 0.5}
+            textAlign="center"
+            fontFamily="Arial, sans-serif"
+            opacity={animationProgress * 0.8 * fadeIn}
+          >
+            {currentSectionData.description}
+          </Text>
+        </>
+      )}
 
       {/* Decorative Elements */}
       <mesh position={[-0.3, 0.4, 0.94]}>
@@ -270,33 +313,13 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         >
           <sphereGeometry args={[0.003 + Math.random() * 0.004, 6, 6]} />
           <meshBasicMaterial
-            color={i % 3 === 0 ? "#ffffff" : i % 3 === 1 ? "#4a9eff" : "#ff6b6b"}
+            color={i % 3 === 0 ? "#ffffff" : i % 3 === 1 ? "#fff" : "#fff"}
             transparent
             opacity={0.4 * animationProgress * fadeIn}
           />
         </mesh>
       ))}
 
-      {/* 3D Corner Accents */}
-      <mesh position={[-0.4, 0.3, 0.95]}>
-        <boxGeometry args={[0.05, 0.05, 0.01]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
-      </mesh>
-
-      <mesh position={[0.4, 0.3, 0.95]}>
-        <boxGeometry args={[0.05, 0.05, 0.01]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
-      </mesh>
-
-      <mesh position={[-0.4, -0.3, 0.95]}>
-        <boxGeometry args={[0.05, 0.05, 0.01]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
-      </mesh>
-
-      <mesh position={[0.4, -0.3, 0.95]}>
-        <boxGeometry args={[0.05, 0.05, 0.01]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
-      </mesh>
     </group>
   );
 }

@@ -6,6 +6,7 @@ import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 import ParticleSystem from "./ParticleSystem";
+import FloatingParticles from "./FloatingParticles";
 
 export default function Scene({ showContent, visibleSubs }) {
   const scroll = useScroll();
@@ -13,7 +14,7 @@ export default function Scene({ showContent, visibleSubs }) {
   return (
     <>
       <VideoBackground scroll={scroll} showContent={showContent} visibleSubs={visibleSubs} />
-      <LogoVideoHUD scroll={scroll} />
+      <LogoVideoHUD scroll={scroll} showContent={showContent} />
       <CameraRig scroll={scroll} />
       <StarField scroll={scroll} />
       
@@ -25,7 +26,12 @@ export default function Scene({ showContent, visibleSubs }) {
         visibleSubs={visibleSubs}
         section="first"
       />
-
+      <FloatingParticles 
+        scroll={scroll} 
+        showContent={showContent} 
+        visibleSubs={visibleSubs}
+        section="first"
+      />
       
       <Preload all />
     </>

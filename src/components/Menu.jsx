@@ -15,6 +15,7 @@ const MENUS = [
     ],
   },
   { name: "THE CHAMBER", sub: ["Art Piece", "Wear the myth"] },
+  { name: "CONTACT", sub: [] },
 ];
 
 export default function Menu({ visibleSubs, onMenuClick, currentSection, isTransitioning }) {

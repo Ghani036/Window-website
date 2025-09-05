@@ -13,9 +13,17 @@ export default function VideoBackground({ scroll, showContent, visibleSubs }) {
 
   const scale = useAspect(1920, 1080, 1);
   const meshRef = useRef();
+  const videoRef = texture.image; // Get the video element
 
   useFrame(() => {
     const t = scroll.offset;
+
+    // Control video progress based on scroll
+    if (videoRef && videoRef.readyState >= 2 && videoRef.duration) {
+      // Map scroll progress to video progress (0 to 0.8 of video duration)
+      const videoProgress = Math.min(t * 0.8, 0.8);
+      videoRef.currentTime = videoRef.duration * videoProgress;
+    }
 
     // Phase 1: Initial zoom out (first scene completion)
     const zoomOut = 1.2 - 0.2 * smoothstepRange(t, 0, 0.5);
