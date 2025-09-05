@@ -6,8 +6,6 @@ import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 import ParticleSystem from "./ParticleSystem";
-import AdvancedParticleSystem from "./AdvancedParticleSystem";
-import FloatingParticles from "./FloatingParticles";
 
 export default function Scene({ showContent, visibleSubs }) {
   const scroll = useScroll();
@@ -20,25 +18,14 @@ export default function Scene({ showContent, visibleSubs }) {
       <StarField scroll={scroll} />
       
       {/* Particle Systems for First Section */}
-      <ParticleSystem 
-        count={800} 
-        scroll={scroll} 
-        showContent={showContent} 
+      <ParticleSystem
+        count={1200}
+        scroll={scroll}
+        showContent={showContent}
         visibleSubs={visibleSubs}
         section="first"
       />
-      <AdvancedParticleSystem 
-        scroll={scroll} 
-        showContent={showContent} 
-        visibleSubs={visibleSubs}
-        section="first"
-      />
-      <FloatingParticles 
-        scroll={scroll} 
-        showContent={showContent} 
-        visibleSubs={visibleSubs}
-        section="first"
-      />
+
       
       <Preload all />
     </>

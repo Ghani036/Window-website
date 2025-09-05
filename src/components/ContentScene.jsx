@@ -2,8 +2,6 @@ import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useVideoTexture, useAspect, Text } from "@react-three/drei";
 import ParticleSystem from "./ParticleSystem";
-import AdvancedParticleSystem from "./AdvancedParticleSystem";
-import FloatingParticles from "./FloatingParticles";
 
 // Content sections data
 const CONTENT_SECTIONS = [
@@ -107,7 +105,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
   // Find current section data
   const currentSectionData = CONTENT_SECTIONS.find(section => section.id === currentSection) || CONTENT_SECTIONS[0];
-  
+
   // Reset animation when section changes
   React.useEffect(() => {
     if (isTransitioning) {
@@ -189,25 +187,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         <meshBasicMaterial color="black" transparent opacity={0.6 * fadeIn} />
       </mesh>
 
-      {/* Particle Systems for Content Section */}
-      <ParticleSystem 
-        count={600} 
-        scroll={scroll} 
-        showContent={showContent} 
+      <ParticleSystem
+        count={1200}
+        scroll={scroll}
+        showContent={showContent}
         visibleSubs={visibleSubs}
-        section="content"
-      />
-      <AdvancedParticleSystem 
-        scroll={scroll} 
-        showContent={showContent} 
-        visibleSubs={visibleSubs}
-        section="content"
-      />
-      <FloatingParticles 
-        scroll={scroll} 
-        showContent={showContent} 
-        visibleSubs={visibleSubs}
-        section="content"
+        section="first"
       />
 
 

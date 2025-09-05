@@ -2,169 +2,151 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export default function FloatingParticles({ 
+export default function WhiteParticleSystem({ 
   scroll, 
+  section = 'first', 
   showContent = false, 
-  visibleSubs = 0,
-  section = 'first' 
+  visibleSubs = 0 
 }) {
   const groupRef = useRef();
 
-  // Create floating particles that move in and out based on scroll
+  // Particle configs (large, medium, small)
   const particles = useMemo(() => {
-    const particleArray = [];
-  
-    for (let i = 0; i < 200; i++) {
-      particleArray.push({
-        position: [
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 30
+    const arr = [];
+
+    // Large
+    for (let i = 0; i < 50; i++) {
+      arr.push({
+        type: 'large',
+        basePos: [
+          (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 20
         ],
-        originalPosition: [
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 30,
-          (Math.random() - 0.5) * 30
-        ],
-        velocity: [
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.02,
-          (Math.random() - 0.5) * 0.02
-        ],
-        size: Math.random() * 0.01 + 0.002, // 🔹 reduced size
-        color: [0.9, 0.9, 0.9],             // 🔹 light gray with white reflection
-        opacity: Math.random() * 0.8 + 0.2,
+        size: Math.random() * 0.015 + 0.01,
+        speed: Math.random() * 0.5 + 0.2,
         phase: Math.random() * Math.PI * 2
       });
     }
-  
-    return particleArray;
+
+    // Medium
+    for (let i = 0; i < 150; i++) {
+      arr.push({
+        type: 'medium',
+        basePos: [
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 25
+        ],
+        size: Math.random() * 0.01 + 0.004,
+        speed: Math.random() * 0.8 + 0.4,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    // Small sparkles
+    for (let i = 0; i < 300; i++) {
+      arr.push({
+        type: 'small',
+        basePos: [
+          (Math.random() - 0.5) * 30,
+          (Math.random() - 0.5) * 30,
+          (Math.random() - 0.5) * 30
+        ],
+        size: Math.random() * 0.006 + 0.002,
+        speed: Math.random() * 1.2 + 0.6,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    return arr;
   }, []);
-  
 
   useFrame((state) => {
     if (!groupRef.current) return;
-
     const time = state.clock.elapsedTime;
-    
-    // Calculate scroll effects
-    let scrollProgress = 0;
-    let particleIntensity = 1;
-    let particleVisibility = 1;
+    const scrollProgress = scroll?.offset ?? 0;
 
-    if (scroll) {
-      scrollProgress = scroll.offset;
-      
-      if (section === 'first') {
-        // First section: particles move away and fade as user scrolls
-        particleIntensity = Math.max(0.1, 1 - scrollProgress * 1.2);
-        particleVisibility = Math.max(0, 1 - scrollProgress * 1.5);
+    // Scroll-based multipliers
+    let visibility = 1;
+    let moveStrength = 1;
+
+    if (section === 'first') {
+      // fade out & move away
+      visibility = Math.max(0, 1 - scrollProgress * 1.5);
+      moveStrength = 1 + scrollProgress * 5;
+    } else {
+      // fade in when content visible
+      if (showContent || visibleSubs >= 9) {
+        visibility = Math.min(1, (scrollProgress - 0.2) * 2);
       } else {
-        // Content section: particles appear and intensify when content is shown
-        if (showContent || visibleSubs >= 9) {
-          particleIntensity = Math.min(2, 0.5 + (scrollProgress - 0.3) * 3);
-          particleVisibility = Math.min(1, (scrollProgress - 0.3) * 2);
-        } else {
-          particleIntensity = 0.1;
-          particleVisibility = 0;
-        }
+        visibility = 0;
       }
+      moveStrength = 1 - scrollProgress * 2;
     }
 
-    // Update each particle
-    groupRef.current.children.forEach((particle, index) => {
-      const particleData = particles[index];
-      if (!particleData) return;
+    // Update particles
+    groupRef.current.children.forEach((particle, i) => {
+      const data = particles[i];
+      if (!data) return;
 
-      // Calculate movement based on scroll
-      const scrollInfluence = scrollProgress * 0.1;
-      
-      // Add floating motion
-      particle.position.x = particleData.originalPosition[0] + 
-        Math.sin(time * 0.5 + particleData.phase) * 2 * particleIntensity +
-        Math.sin(time * 0.3 + index * 0.1) * 1 * particleIntensity;
-      
-      particle.position.y = particleData.originalPosition[1] + 
-        Math.cos(time * 0.4 + particleData.phase) * 2 * particleIntensity +
-        Math.cos(time * 0.2 + index * 0.15) * 1 * particleIntensity;
-      
-      particle.position.z = particleData.originalPosition[2] + 
-        Math.sin(time * 0.6 + particleData.phase) * 1.5 * particleIntensity +
-        Math.sin(time * 0.35 + index * 0.2) * 0.8 * particleIntensity;
+      const base = data.basePos;
 
-      // Add scroll-based movement (particles come in/out)
-      if (section === 'first') {
-        // Move particles away from center as user scrolls
-        const distanceFromCenter = Math.sqrt(
-          particle.position.x ** 2 + 
-          particle.position.y ** 2 + 
-          particle.position.z ** 2
-        );
-        
-        if (distanceFromCenter > 0) {
-          const direction = {
-            x: particle.position.x / distanceFromCenter,
-            y: particle.position.y / distanceFromCenter,
-            z: particle.position.z / distanceFromCenter
-          };
-          
-          particle.position.x += direction.x * scrollProgress * 0.5;
-          particle.position.y += direction.y * scrollProgress * 0.5;
-          particle.position.z += direction.z * scrollProgress * 0.5;
-        }
-      } else {
-        // Move particles towards center as content appears
-        const targetDistance = 5 + scrollProgress * 10;
-        const currentDistance = Math.sqrt(
-          particle.position.x ** 2 + 
-          particle.position.y ** 2 + 
-          particle.position.z ** 2
-        );
-        
-        if (currentDistance > targetDistance) {
-          const direction = {
-            x: particle.position.x / currentDistance,
-            y: particle.position.y / currentDistance,
-            z: particle.position.z / currentDistance
-          };
-          
-          particle.position.x -= direction.x * 0.1;
-          particle.position.y -= direction.y * 0.1;
-          particle.position.z -= direction.z * 0.1;
-        }
-      }
+      // Floating motion
+      const fx = Math.sin(time * data.speed + data.phase) * 0.5;
+      const fy = Math.cos(time * data.speed * 0.8 + data.phase) * 0.5;
+      const fz = Math.sin(time * data.speed * 0.6 + data.phase) * 0.5;
 
-      // Update material properties
-      particle.material.opacity = particleData.opacity * particleVisibility;
-      
-      // Add subtle color animation
-      const colorIntensity = 0.7 + Math.sin(time * 0.3 + index * 0.1) * 0.3;
-      particle.material.color.setRGB(
-        particleData.color[0] * colorIntensity,
-        particleData.color[1] * colorIntensity,
-        particleData.color[2] * colorIntensity
+      // Base position + floating
+      particle.position.set(
+        base[0] + fx,
+        base[1] + fy,
+        base[2] + fz
       );
 
-      // Add rotation
-      particle.rotation.x += 0.01 * particleIntensity;
-      particle.rotation.y += 0.015 * particleIntensity;
+      // Scroll effect (in/out)
+      const dist = Math.sqrt(
+        particle.position.x ** 2 +
+        particle.position.y ** 2 +
+        particle.position.z ** 2
+      );
+      const dir = new THREE.Vector3(
+        particle.position.x / dist,
+        particle.position.y / dist,
+        particle.position.z / dist
+      );
+
+      if (section === 'first') {
+        // push out
+        particle.position.addScaledVector(dir, scrollProgress * 5);
+      } else {
+        // pull in
+        particle.position.addScaledVector(dir, moveStrength);
+      }
+
+      // Opacity
+      particle.material.opacity = visibility;
+
+      // Tiny rotations for sparkle
+      particle.rotation.x += 0.002;
+      particle.rotation.y += 0.003;
     });
 
-    // Rotate the entire group
-    groupRef.current.rotation.x = time * 0.01;
-    groupRef.current.rotation.y = time * 0.005;
+    // Rotate the whole system slightly
+    groupRef.current.rotation.y = time * 0.01;
   });
 
   return (
     <group ref={groupRef}>
-      {particles.map((particleData, index) => (
-        <mesh key={index} position={particleData.position}>
-          <sphereGeometry args={[particleData.size, 6, 4]} />
+      {particles.map((p, i) => (
+        <mesh key={i} position={p.basePos}>
+          <sphereGeometry args={[p.size, 16, 16]} />
           <meshBasicMaterial
-            color={particleData.color}
+            color={'white'}
             transparent
-            opacity={particleData.opacity}
+            opacity={1}
             blending={THREE.AdditiveBlending}
+            depthWrite={false} // prevents weird overlap
           />
         </mesh>
       ))}
