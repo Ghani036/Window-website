@@ -7,6 +7,7 @@ import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 import ParticleSystem from "./ParticleSystem";
 import FloatingParticles from "./FloatingParticles";
+import DustParticles from "./DustParticles";
 
 export default function Scene({ showContent, visibleSubs }) {
   const scroll = useScroll();
@@ -20,7 +21,7 @@ export default function Scene({ showContent, visibleSubs }) {
       
       {/* Particle Systems for First Section */}
       <ParticleSystem
-        count={1200}
+        count={1500}
         scroll={scroll}
         showContent={showContent}
         visibleSubs={visibleSubs}
@@ -29,6 +30,14 @@ export default function Scene({ showContent, visibleSubs }) {
       <FloatingParticles 
         scroll={scroll} 
         showContent={showContent} 
+        visibleSubs={visibleSubs}
+        section="first"
+      />
+      
+      {/* Dust Particles for First Section */}
+      <DustParticles
+        scroll={scroll}
+        showContent={showContent}
         visibleSubs={visibleSubs}
         section="first"
       />

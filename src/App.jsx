@@ -14,7 +14,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       const totalSubs = 9;
       
       // Handle going back to first section when scrolling up
-      if (progress < 0.05 && showContent) {
+      if (progress < 0.03 && showContent) {
         onBackToFirstSection();
         return;
       }
@@ -23,22 +23,25 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       // Once all items are visible (visibleSubs >= 9), keep them visible
       if (visibleSubs >= 9) {
         setVisibleSubs(9);
-        // Auto-transition to content section when all menu items are visible
-        if (!showContent && progress > 0.6) {
+        // Auto-transition to content section when all menu items are visible and scrolled further
+        if (!showContent && progress > 0.7) {
           setShowContent(true);
         }
         return;
       }
       
-      const firstSceneProgress = Math.min(progress / 0.5, 1);
+      // Improved scroll progression for smoother menu reveal
+      const firstSceneProgress = Math.min(progress / 0.6, 1);
       const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
       
       setVisibleSubs(newVisibleSubs);
     };
 
-    scroll.el.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => scroll.el.removeEventListener("scroll", handleScroll);
+    if (scroll && scroll.el) {
+      scroll.el.addEventListener("scroll", handleScroll);
+      handleScroll();
+      return () => scroll.el.removeEventListener("scroll", handleScroll);
+    }
   }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection]);
 
   const handleSectionReached = (sectionId) => {
@@ -60,24 +63,34 @@ export default function App() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleMenuClick = (sectionId) => {
+    console.log("Menu clicked:", sectionId); // Debug log
+    
     // Start transition
     setIsTransitioning(true);
     
-    // Change content after a brief delay for smooth transition
+    // Change content immediately for better responsiveness
+    setCurrentSection(sectionId);
+    setShowContent(true);
+    
+    // End transition after a brief delay
     setTimeout(() => {
-      setCurrentSection(sectionId);
-      setShowContent(true);
       setIsTransitioning(false);
-      
-      // Scroll to show content section
-      const scrollElement = document.querySelector('.scroll-container');
-      if (scrollElement) {
-        scrollElement.scrollTo({
-          top: scrollElement.scrollHeight * 0.6, // Scroll to show content
-          behavior: 'smooth'
-        });
-      }
-    }, 200); // 200ms transition delay
+    }, 300);
+    
+    // For contact form, don't scroll - just show it
+    if (sectionId === "contact") {
+      console.log("Contact form selected - showing form");
+      return;
+    }
+    
+    // Scroll to show content section for other sections
+    const scrollElement = document.querySelector('.scroll-container');
+    if (scrollElement) {
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight * 0.7, // Scroll to show content
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleBackToFirstSection = () => {
@@ -110,7 +123,7 @@ export default function App() {
 
       <div className="relative w-full h-screen scroll-container">
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
-          <ScrollControls pages={15} damping={0.3}>
+          <ScrollControls pages={15} damping={0.2} distance={1} horizontal={false}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 
               setCurrentSection={setCurrentSection}

@@ -15,46 +15,46 @@ export default function WhiteParticleSystem({
     const arr = [];
 
     // Large
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 80; i++) {
       arr.push({
         type: 'large',
         basePos: [
-          (Math.random() - 0.5) * 40, // Increased range
-          (Math.random() - 0.5) * 40, // Increased range
-          (Math.random() - 0.5) * 40  // Increased range
+          (Math.random() - 0.5) * 60, // Much larger range
+          (Math.random() - 0.5) * 60, // Much larger range
+          (Math.random() - 0.5) * 60  // Much larger range
         ],
-        size: Math.random() * 0.025 + 0.015, // Increased size
-        speed: Math.random() * 0.1 + 0.05, // Much slower
+        size: Math.random() * 0.015 + 0.008, // Smaller, cleaner size
+        speed: Math.random() * 0.15 + 0.08, // Better speed
         phase: Math.random() * Math.PI * 2
       });
     }
 
     // Medium
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 200; i++) {
       arr.push({
         type: 'medium',
         basePos: [
-          (Math.random() - 0.5) * 45, // Increased range
-          (Math.random() - 0.5) * 45, // Increased range
-          (Math.random() - 0.5) * 45  // Increased range
+          (Math.random() - 0.5) * 65, // Much larger range
+          (Math.random() - 0.5) * 65, // Much larger range
+          (Math.random() - 0.5) * 65  // Much larger range
         ],
-        size: Math.random() * 0.015 + 0.008, // Increased size
-        speed: Math.random() * 0.15 + 0.08, // Much slower
+        size: Math.random() * 0.01 + 0.005, // Smaller, cleaner size
+        speed: Math.random() * 0.2 + 0.1, // Better speed
         phase: Math.random() * Math.PI * 2
       });
     }
 
     // Small sparkles
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 400; i++) {
       arr.push({
         type: 'small',
         basePos: [
-          (Math.random() - 0.5) * 50, // Increased range
-          (Math.random() - 0.5) * 50, // Increased range
-          (Math.random() - 0.5) * 50  // Increased range
+          (Math.random() - 0.5) * 70, // Much larger range
+          (Math.random() - 0.5) * 70, // Much larger range
+          (Math.random() - 0.5) * 70  // Much larger range
         ],
-        size: Math.random() * 0.012 + 0.005, // Increased size
-        speed: Math.random() * 0.2 + 0.1, // Much slower
+        size: Math.random() * 0.008 + 0.003, // Smaller, cleaner size
+        speed: Math.random() * 0.25 + 0.15, // Better speed
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -92,10 +92,10 @@ export default function WhiteParticleSystem({
 
       const base = data.basePos;
 
-      // Very visible floating motion
-      const fx = Math.sin(time * data.speed * 0.8 + data.phase) * 1.0; // Much more visible movement
-      const fy = Math.cos(time * data.speed * 0.7 + data.phase) * 1.0; // Much more visible movement
-      const fz = Math.sin(time * data.speed * 0.9 + data.phase) * 1.0; // Much more visible movement
+      // Smoother, more random floating motion
+      const fx = Math.sin(time * data.speed * 0.4 + data.phase) * 0.8 + Math.cos(time * data.speed * 0.3 + data.phase) * 0.4;
+      const fy = Math.cos(time * data.speed * 0.45 + data.phase) * 0.8 + Math.sin(time * data.speed * 0.35 + data.phase) * 0.4;
+      const fz = Math.sin(time * data.speed * 0.5 + data.phase) * 0.8 + Math.cos(time * data.speed * 0.4 + data.phase) * 0.4;
 
       // Base position + slow floating
       const currentX = base[0] + fx;
@@ -147,9 +147,10 @@ export default function WhiteParticleSystem({
           <meshBasicMaterial
             color={'white'}
             transparent
-            opacity={1}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false} // prevents weird overlap
+            opacity={0.8}
+            blending={THREE.NormalBlending}
+            depthWrite={false}
+            alphaTest={0.1}
           />
         </mesh>
       ))}

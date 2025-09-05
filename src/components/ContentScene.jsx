@@ -4,6 +4,7 @@ import { useVideoTexture, useAspect, Text, Html } from "@react-three/drei";
 import ParticleSystem from "./ParticleSystem";
 import FloatingParticles from "./FloatingParticles";
 import StarField from "./StarField";
+import DustParticles from "./DustParticles";
 import ContactForm from "./ContactForm";
 
 // Content sections data
@@ -83,8 +84,8 @@ const CONTENT_SECTIONS = [
   {
     id: "contact",
     title: "CONTACT",
-    content: "Get in touch with us and send us some good gifts. We'd love to hear from you and collaborate on amazing projects.",
-    description: "Ready to start your next project? Contact us and let's create something extraordinary together."
+    content: "",
+    description: ""
   }
 ];
 
@@ -123,18 +124,18 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
     const progress = scroll.offset;
 
-    // Control content video progress based on scroll (slight progress)
+    // Control content video progress based on scroll (improved synchronization)
     if (contentVideoRef && contentVideoRef.readyState >= 2 && contentVideoRef.duration) {
-      // Map scroll progress to video progress (0 to 0.3 of video duration for subtle effect)
-      const videoProgress = Math.min(progress * 0.3, 0.3);
+      // Map scroll progress to video progress (0 to 0.5 of video duration for better effect)
+      const videoProgress = Math.min(progress * 0.5, 0.5);
       contentVideoRef.currentTime = contentVideoRef.duration * videoProgress;
     }
 
     // Show content scene when:
-    // 1. Menu item is clicked (showContent = true)
+    // 1. Menu item is clicked (showContent = true) - PRIORITY
     // 2. All menu items are visible (visibleSubs >= 9)
-    // 3. Scrolled past 40% (earlier threshold)
-    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.4;
+    // 3. Scrolled past 50% (improved threshold)
+    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.5;
     setIsVisible(shouldShow);
 
     // Smooth fade in effect
@@ -147,7 +148,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         setFadeIn(1);
       } else {
         // If scrolling, fade in gradually
-        const fadeProgress = Math.min(1, (progress - 0.4) / 0.2);
+        const fadeProgress = Math.min(1, (progress - 0.5) / 0.2);
         setFadeIn(fadeProgress);
       }
     } else {
@@ -183,8 +184,24 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     }
   });
 
-  // Don't render if not visible
-  if (!isVisible) return null;
+  // Use useEffect to handle contact form visibility
+  React.useEffect(() => {
+    console.log("ContentScene - currentSection:", currentSection, "showContent:", showContent);
+    if (currentSection === "contact") {
+      console.log("Setting contact form visible");
+      setIsVisible(true);
+      setFadeIn(1);
+    }
+  }, [currentSection, showContent]);
+
+  // Don't render if not visible, except for contact form
+  if (!isVisible && currentSection !== "contact") return null;
+  
+  // Always show contact form when contact is selected
+  if (currentSection === "contact") {
+    setIsVisible(true);
+    setFadeIn(1);
+  }
 
   return (
     <group ref={contentRef} position={[0, 0, 0]}>
@@ -192,13 +209,13 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       {/* Background Video - Second video for content sections */}
       <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0.9]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={fadeIn} />
+        <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={currentSection === "contact" ? 1 : fadeIn} />
       </mesh>
 
       {/* Black Overlay Layer */}
       <mesh scale={scale} position={[0, 0, 0.91]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={0.6 * fadeIn} />
+        <meshBasicMaterial color="black" transparent opacity={currentSection === "contact" ? 0.6 : 0.6 * fadeIn} />
       </mesh>
 
       {/* Star Field for Content Section */}
@@ -206,7 +223,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
       {/* Particle Systems for Content Section */}
       <ParticleSystem
-        count={1200}
+        count={1500}
         scroll={scroll}
         showContent={showContent}
         visibleSubs={visibleSubs}
@@ -218,24 +235,35 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         visibleSubs={visibleSubs}
         section="content"
       />
+      
+      {/* Dust Particles for Content Section */}
+      <DustParticles
+        scroll={scroll}
+        showContent={showContent}
+        visibleSubs={visibleSubs}
+        section="content"
+      />
 
 
 
       {/* Conditional Content Rendering */}
       {currentSection === "contact" ? (
         // Contact Form
-        <Html
-          position={[0, 0, 0.95]}
-          transform
-          style={{
-            width: viewport.width * 0.8,
-            height: viewport.height * 0.8,
-            pointerEvents: 'auto',
-            opacity: animationProgress * fadeIn
-          }}
-        >
-          <ContactForm />
-        </Html>
+        <>
+          {console.log("Rendering contact form")}
+          <Html
+            position={[0, 0, 0.95]}
+            transform
+            style={{
+              width: viewport.width * 0.6, // 60% width for better visibility
+              height: viewport.height * 0.8,
+              pointerEvents: 'auto',
+              opacity: 1 // Always visible when contact is selected
+            }}
+          >
+            <ContactForm />
+          </Html>
+        </>
       ) : (
         <>
           {/* Title Text */}

@@ -20,8 +20,8 @@ export default function LogoVideoHUD({ scroll, showContent }) {
     
     const t = scroll.offset;
 
-    // 🔹 Logo reveal starts at 0.1 and ends at 0.4 scroll (earlier and longer)
-    const revealProgress = smoothstepRange(t, 0.1, 0.4);
+    // 🔹 Logo reveal starts at 0.05 and ends at 0.35 scroll (earlier and longer)
+    const revealProgress = smoothstepRange(t, 0.05, 0.35);
 
     // Scrub video based on scroll progress
     if (videoRef && videoRef.readyState >= 2 && videoRef.duration) {
@@ -30,7 +30,7 @@ export default function LogoVideoHUD({ scroll, showContent }) {
 
     if (meshRef.current) {
       // Show logo during reveal, fade out after
-      const opacity = revealProgress < 1 ? revealProgress : Math.max(0, 1 - smoothstepRange(t, 0.4, 0.5));
+      const opacity = revealProgress < 1 ? revealProgress : Math.max(0, 1 - smoothstepRange(t, 0.35, 0.45));
       meshRef.current.material.opacity = opacity;
     }
   });

@@ -24,12 +24,12 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-4xl"
+        className="w-full min-w-[50%] max-w-2xl bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10 p-8"
       >
         {/* Title */}
         <motion.h1
@@ -46,24 +46,14 @@ export default function ContactForm() {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="w-full h-px bg-white mb-6"
+          className="w-full h-px bg-white mb-8"
         />
-
-        {/* Subtitle */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-lg text-white text-center mb-8 font-avenir"
-        >
-          LET'S SHARE A WINDOW
-        </motion.h2>
 
         {/* Contact Form */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
           onSubmit={handleSubmit}
           className="space-y-8 w-full"
         >

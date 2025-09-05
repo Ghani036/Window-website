@@ -43,6 +43,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
   // Show all menu items when:
   // 1. In content sections, OR
   // 2. All items are already visible (visibleSubs >= 9)
+  // 3. Menu item was clicked (showContent is true)
   const effectiveVisibleSubs = (isInContentSection || visibleSubs >= 9) ? 9 : Math.max(1, visibleSubs);
 
   return (
