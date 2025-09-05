@@ -11,7 +11,7 @@ const MENUS = [
       "The Art of Storytelling",
       "Story Board",
       "Digital Collage Art",
-      "From Sketch to Digital to Ai",
+      "From Sketch to Digital to AI",
     ],
   },
   { name: "THE CHAMBER", sub: ["Art Piece", "Wear the myth"] },
@@ -26,6 +26,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
   const toggleMenu = () => setMenuOpen((prev => !prev))
 
   const handleClick = (key) => {
+    console.log("Menu - handleClick called with key:", key);
     if (onMenuClick && !isTransitioning) {
       onMenuClick(key);
     }
@@ -113,6 +114,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
               {item.sub.map((subItem, subIdx) => {
                 const globalSubIndex = subCounter++;
                 const subKey = subItem.toLowerCase().replace(/\s+/g, "");
+                console.log("Menu - Generated subKey:", subKey, "from subItem:", subItem);
                 return globalSubIndex < effectiveVisibleSubs ? (
                   <motion.div
                     key={subIdx}

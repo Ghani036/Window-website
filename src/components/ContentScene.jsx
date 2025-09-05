@@ -113,9 +113,8 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
   // Reset animation when section changes
   React.useEffect(() => {
-    if (isTransitioning) {
-      setAnimationProgress(0);
-    }
+    console.log("ContentScene - Section changed to:", currentSection, "isTransitioning:", isTransitioning);
+    setAnimationProgress(0); // Always reset animation when section changes
   }, [currentSection, isTransitioning]);
 
   // Calculate visibility and animations based on scroll and menu clicks
@@ -138,12 +137,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     // 4. Contact form is selected
     const shouldShow = showContent || visibleSubs >= 9 || progress > 0.5 || currentSection === "contact";
     
-    // Only update visibility if not contact form (to avoid conflicts)
-    if (currentSection !== "contact") {
-      setIsVisible(shouldShow);
-    } else {
+    // Always update visibility based on current section
+    if (currentSection === "contact") {
       // Force visibility for contact form
       setIsVisible(true);
+    } else {
+      setIsVisible(shouldShow);
     }
 
     // Smooth fade in effect
@@ -165,6 +164,11 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     } else {
       setFadeIn(0);
     }
+    
+    // Debug logging for content switching
+    if (showContent && currentSection !== "thewindow") {
+      console.log("ContentScene - Should show content for section:", currentSection, "fadeIn:", fadeIn, "animationProgress:", animationProgress);
+    }
 
     // Don't return early if contact form is selected
     if (!shouldShow && currentSection !== "contact") return;
@@ -174,7 +178,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
     // Animate content appearance (faster during transitions)
     if (animationProgress < 1) {
-      const speed = isTransitioning ? 0.05 : 0.02;
+      const speed = isTransitioning ? 0.08 : 0.03; // Increased speed for better responsiveness
       setAnimationProgress(prev => Math.min(prev + speed, 1));
     }
 

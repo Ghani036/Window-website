@@ -63,6 +63,11 @@ export default function App() {
   const [showContent, setShowContent] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // Debug state changes
+  useEffect(() => {
+    console.log("App state changed - currentSection:", currentSection, "showContent:", showContent, "isTransitioning:", isTransitioning);
+  }, [currentSection, showContent, isTransitioning]);
+
   const handleMenuClick = (sectionId) => {
     console.log("=== MENU CLICK DEBUG ===");
     console.log("Menu clicked:", sectionId); // Debug log
@@ -81,6 +86,7 @@ export default function App() {
     setTimeout(() => {
       setIsTransitioning(false);
       console.log("Transition ended - currentSection should be:", sectionId);
+      console.log("=== END MENU CLICK DEBUG ===");
     }, 300);
     
     // For contact form, don't scroll - just show it
