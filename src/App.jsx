@@ -4,6 +4,7 @@ import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
 import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
+import ContactForm from "./components/ContactForm";
 
 function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent }) {
   const scroll = useScroll();
@@ -63,7 +64,9 @@ export default function App() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleMenuClick = (sectionId) => {
+    console.log("=== MENU CLICK DEBUG ===");
     console.log("Menu clicked:", sectionId); // Debug log
+    console.log("Current state - currentSection:", currentSection, "showContent:", showContent);
     
     // Start transition
     setIsTransitioning(true);
@@ -72,14 +75,18 @@ export default function App() {
     setCurrentSection(sectionId);
     setShowContent(true);
     
+    console.log("After setting - currentSection:", sectionId, "showContent: true");
+    
     // End transition after a brief delay
     setTimeout(() => {
       setIsTransitioning(false);
+      console.log("Transition ended - currentSection should be:", sectionId);
     }, 300);
     
     // For contact form, don't scroll - just show it
     if (sectionId === "contact") {
       console.log("Contact form selected - showing form");
+      console.log("=== END MENU CLICK DEBUG ===");
       return;
     }
     
@@ -120,6 +127,25 @@ export default function App() {
         currentSection={currentSection}
         isTransitioning={isTransitioning}
       />
+
+      {/* Contact Form Overlay - Render outside Three.js scene */}
+      {currentSection === "contact" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-2xl mx-4 relative">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setCurrentSection("thewindow");
+                setShowContent(false);
+              }}
+              className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-gray-300 z-10"
+            >
+              ×
+            </button>
+            <ContactForm />
+          </div>
+        </div>
+      )}
 
       <div className="relative w-full h-screen scroll-container">
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">

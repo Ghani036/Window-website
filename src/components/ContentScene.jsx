@@ -135,11 +135,22 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     // 1. Menu item is clicked (showContent = true) - PRIORITY
     // 2. All menu items are visible (visibleSubs >= 9)
     // 3. Scrolled past 50% (improved threshold)
-    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.5;
-    setIsVisible(shouldShow);
+    // 4. Contact form is selected
+    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.5 || currentSection === "contact";
+    
+    // Only update visibility if not contact form (to avoid conflicts)
+    if (currentSection !== "contact") {
+      setIsVisible(shouldShow);
+    } else {
+      // Force visibility for contact form
+      setIsVisible(true);
+    }
 
     // Smooth fade in effect
-    if (shouldShow) {
+    if (currentSection === "contact") {
+      // Contact form is always fully visible
+      setFadeIn(1);
+    } else if (shouldShow) {
       if (showContent) {
         // If menu item was clicked, show immediately
         setFadeIn(1);
@@ -155,7 +166,8 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       setFadeIn(0);
     }
 
-    if (!shouldShow) return;
+    // Don't return early if contact form is selected
+    if (!shouldShow && currentSection !== "contact") return;
 
     // Content changes are handled by App.jsx, not here
     // This prevents conflicts with the main scroll logic
@@ -188,19 +200,16 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
   React.useEffect(() => {
     console.log("ContentScene - currentSection:", currentSection, "showContent:", showContent);
     if (currentSection === "contact") {
-      console.log("Setting contact form visible");
-      setIsVisible(true);
-      setFadeIn(1);
+      console.log("Contact form selected - should be visible");
     }
   }, [currentSection, showContent]);
 
-  // Don't render if not visible, except for contact form
-  if (!isVisible && currentSection !== "contact") return null;
-  
-  // Always show contact form when contact is selected
+  // Always render contact form when selected, otherwise use normal visibility logic
   if (currentSection === "contact") {
-    setIsVisible(true);
-    setFadeIn(1);
+    // Contact form is always visible when selected
+    console.log("Contact form should be visible - rendering");
+  } else if (!isVisible) {
+    return null;
   }
 
   return (
@@ -250,18 +259,47 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       {currentSection === "contact" ? (
         // Contact Form
         <>
-          {console.log("Rendering contact form")}
+          {console.log("Rendering contact form - currentSection:", currentSection, "isVisible:", isVisible, "fadeIn:", fadeIn)}
+          
+          {/* Test: Simple text to verify contact form is rendering */}
+         
+          
+          {/* Test: Render contact form directly without Html wrapper */}
           <Html
-            position={[0, 0, 0.95]}
+            position={[0, 0, 0.98]}
             transform
             style={{
-              width: viewport.width * 0.6, // 60% width for better visibility
+              width: viewport.width * 0.6,
               height: viewport.height * 0.8,
               pointerEvents: 'auto',
-              opacity: 1 // Always visible when contact is selected
+              opacity: 1,
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
             }}
           >
-            <ContactForm />
+            <div style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid white',
+              borderRadius: '10px',
+              padding: '20px',
+              color: 'white',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>CONTACT FORM</h1>
+              <p style={{ fontSize: '16px', textAlign: 'center' }}>
+                This is a test to see if the Html component is working.
+                If you can see this, the Html component is rendering correctly.
+              </p>
+              <ContactForm />
+            </div>
           </Html>
         </>
       ) : (
