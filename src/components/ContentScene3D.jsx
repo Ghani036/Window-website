@@ -2,7 +2,6 @@ import React from "react";
 import { Preload, useScroll } from "@react-three/drei";
 
 import VideoBackground from "./VideoBackground";
-import LogoVideoHUD from "./LogoVideoHUD";
 import CameraRig from "./CameraRig";
 import StarField from "./StarField";
 

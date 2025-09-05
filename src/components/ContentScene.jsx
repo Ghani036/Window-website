@@ -206,8 +206,6 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
   // Always render contact form when selected, otherwise use normal visibility logic
   if (currentSection === "contact") {
-    // Contact form is always visible when selected
-    console.log("Contact form should be visible - rendering");
   } else if (!isVisible) {
     return null;
   }
@@ -253,18 +251,10 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         section="content"
       />
 
-
-
       {/* Conditional Content Rendering */}
       {currentSection === "contact" ? (
         // Contact Form
         <>
-          {console.log("Rendering contact form - currentSection:", currentSection, "isVisible:", isVisible, "fadeIn:", fadeIn)}
-          
-          {/* Test: Simple text to verify contact form is rendering */}
-         
-          
-          {/* Test: Render contact form directly without Html wrapper */}
           <Html
             position={[0, 0, 0.98]}
             transform
@@ -294,10 +284,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
               justifyContent: 'center'
             }}>
               <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>CONTACT FORM</h1>
-              <p style={{ fontSize: '16px', textAlign: 'center' }}>
-                This is a test to see if the Html component is working.
-                If you can see this, the Html component is rendering correctly.
-              </p>
+             
               <ContactForm />
             </div>
           </Html>
