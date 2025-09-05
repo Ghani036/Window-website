@@ -23,8 +23,9 @@ export default function VideoBackground({ scroll, showContent, visibleSubs }) {
     // Phase 2: Steady state with subtle pulse
     const pulseZoom = 1.0 + 0.05 * Math.sin(t * Math.PI * 2);
 
-    // Phase 3: Fade out when content is shown OR when all menu items are visible
-    const fadeOut = (showContent || visibleSubs >= 9) ? 0 : Math.max(0, 1 - smoothstepRange(t, 0.4, 0.6));
+    // Phase 3: Fade out when all menu items are visible OR when scrolled past threshold
+    // Keep window content visible when menu items are clicked, just reduce opacity slightly
+    const fadeOut = visibleSubs >= 9 ? 0 : showContent ? 0.3 : Math.max(0, 1 - smoothstepRange(t, 0.4, 0.6));
 
     const finalZoom = t < 0.5 ? zoomOut : pulseZoom;
 
@@ -45,7 +46,7 @@ export default function VideoBackground({ scroll, showContent, visibleSubs }) {
       {/* Black overlay plane */}
       <mesh scale={scale} position={[0, 0, 1.01]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={(showContent || visibleSubs >= 9) ? 0 : 0.4 * Math.max(0, 1 - smoothstepRange(scroll.offset, 0.4, 0.6))} />
+        <meshBasicMaterial color="black" transparent opacity={visibleSubs >= 9 ? 0 : showContent ? 0.2 : 0.4 * Math.max(0, 1 - smoothstepRange(scroll.offset, 0.4, 0.6))} />
       </mesh>
     </>
   );

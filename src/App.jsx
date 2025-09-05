@@ -12,7 +12,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
     const handleScroll = () => {
       const progress = scroll.offset;
       const totalSubs = 9;
-      n
+      
       // Handle going back to first section when scrolling up
       if (progress < 0.05 && showContent) {
         onBackToFirstSection();

@@ -13,7 +13,7 @@ export default function FloatingParticles({
   // Create floating particles that move in and out based on scroll
   const particles = useMemo(() => {
     const particleArray = [];
-    
+  
     for (let i = 0; i < 200; i++) {
       particleArray.push({
         position: [
@@ -31,16 +31,16 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 0.02,
           (Math.random() - 0.5) * 0.02
         ],
-        size: Math.random() * 0.02 + 0.005,
-        color: section === 'first' ? 
-          [1, 0.9, 0.3] : [0.3, 0.7, 1],
+        size: Math.random() * 0.01 + 0.002, // 🔹 reduced size
+        color: [0.9, 0.9, 0.9],             // 🔹 light gray with white reflection
         opacity: Math.random() * 0.8 + 0.2,
         phase: Math.random() * Math.PI * 2
       });
     }
-    
+  
     return particleArray;
-  }, [section]);
+  }, []);
+  
 
   useFrame((state) => {
     if (!groupRef.current) return;
