@@ -6,7 +6,7 @@ import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
 import ContactForm from "./components/ContactForm";
 
-function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent, manuallySelected, setManuallySelected }) {
   const scroll = useScroll();
   const lastScrollPosition = useRef(0);
 
@@ -19,7 +19,14 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       
       // Track scroll direction
       const isScrollingUp = progress < lastScrollPosition.current;
+      const scrollDelta = Math.abs(progress - lastScrollPosition.current);
       lastScrollPosition.current = progress;
+      
+      // Reset manual selection if user scrolls significantly (> 5% change)
+      if (manuallySelected && scrollDelta > 0.05) {
+        console.log("Resetting manual selection due to significant scroll");
+        setManuallySelected(false);
+      }
       
       console.log("Scroll progress:", progress, "showContent:", showContent, "currentSection:", currentSection);
       
@@ -42,15 +49,15 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
           setCurrentSection("thefounder");
         }
         
-        // Content switching logic (only if in Scene 2)
-        if (showContent) {
+        // Content switching logic (only if in Scene 2 and not manually selected)
+        if (showContent && !manuallySelected) {
           const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
           const contentProgress = (progress - 0.6) / 0.4; // 0.6 to 1.0 mapped to 0 to 1
           const sectionIndex = Math.floor(contentProgress * contentSections.length);
           const targetSection = contentSections[Math.min(sectionIndex, contentSections.length - 1)];
           
           if (targetSection && currentSection !== targetSection && currentSection !== "contact") {
-            console.log("Scene 2: Switching to section:", targetSection);
+            console.log("Scene 2: Auto-switching to section:", targetSection);
             setCurrentSection(targetSection);
           }
         }
@@ -69,7 +76,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       handleScroll();
       return () => scroll.el.removeEventListener("scroll", handleScroll);
     }
-  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection, currentSection, isTransitioning, setShowContent, setCurrentSection]);
+  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection, currentSection, isTransitioning, setShowContent, setCurrentSection, manuallySelected, setManuallySelected]);
 
 
   const handleSectionReached = (sectionId) => {
@@ -89,6 +96,7 @@ export default function App() {
   const [currentSection, setCurrentSection] = useState("thewindow");
   const [showContent, setShowContent] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [manuallySelected, setManuallySelected] = useState(false);
 
   // Debug state changes
   useEffect(() => {
@@ -110,6 +118,7 @@ export default function App() {
     setShowContent(true);
     setCurrentSection(sectionId);
     setVisibleSubs(9);
+    setManuallySelected(true); // Mark as manually selected
     
     // Calculate scroll position in Scene 2 range (60% to 100%)
     const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
@@ -143,6 +152,7 @@ export default function App() {
     setCurrentSection("thewindow");
     setShowContent(false);
     setVisibleSubs(9); // Keep all menu items visible
+    setManuallySelected(false); // Reset manual selection
     
     // Quick transition without auto-scroll
     setTimeout(() => {
@@ -191,6 +201,8 @@ export default function App() {
               onBackToFirstSection={handleBackToFirstSection}
               isTransitioning={isTransitioning}
               setShowContent={setShowContent}
+              manuallySelected={manuallySelected}
+              setManuallySelected={setManuallySelected}
             />
           </ScrollControls>
         </Canvas>
