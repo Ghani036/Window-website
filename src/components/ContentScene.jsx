@@ -1,11 +1,10 @@
 import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useVideoTexture, useAspect, Text, Html } from "@react-three/drei";
+import { useVideoTexture, useAspect, Text } from "@react-three/drei";
 import ParticleSystem from "./ParticleSystem";
 import FloatingParticles from "./FloatingParticles";
 import StarField from "./StarField";
 import DustParticles from "./DustParticles";
-import ContactForm from "./ContactForm";
 
 // Content sections data
 const CONTENT_SECTIONS = [
@@ -123,58 +122,23 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
     const progress = scroll.offset;
 
-    // Control content video progress based on scroll (improved synchronization)
-    if (contentVideoRef && contentVideoRef.readyState >= 2 && contentVideoRef.duration) {
-      // Map scroll progress to video progress (0 to 0.5 of video duration for better effect)
-      const videoProgress = Math.min(progress * 0.5, 0.5);
-      contentVideoRef.currentTime = contentVideoRef.duration * videoProgress;
-    }
+    // Let content video play naturally - no scroll control
+    // Video will loop automatically
 
-    // Show content scene when:
-    // 1. Menu item is clicked (showContent = true) - PRIORITY
-    // 2. All menu items are visible (visibleSubs >= 9)
-    // 3. Scrolled past 50% (improved threshold)
-    // 4. Contact form is selected
-    const shouldShow = showContent || visibleSubs >= 9 || progress > 0.5 || currentSection === "contact";
+    // Simplified visibility logic - show content scene when needed
+    const shouldShow = showContent || currentSection !== "thewindow";
     
-    // Always update visibility based on current section
-    if (currentSection === "contact") {
-      // Force visibility for contact form
-      setIsVisible(true);
-    } else {
-      // Improved visibility logic: hide content when scrolling back to first section
-      // This ensures content disappears when user scrolls back up
-      setIsVisible(shouldShow && progress > 0.2);
-    }
-
-    // Smooth fade in effect
-    if (currentSection === "contact") {
-      // Contact form is always fully visible
-      setFadeIn(1);
-    } else if (shouldShow && progress > 0.2) {
-      if (showContent) {
-        // If menu item was clicked, show immediately
-        setFadeIn(1);
-      } else if (visibleSubs >= 9) {
-        // If all menu items are visible, show content
-        setFadeIn(1);
-      } else {
-        // If scrolling, fade in gradually
-        const fadeProgress = Math.min(1, (progress - 0.5) / 0.2);
-        setFadeIn(fadeProgress);
-      }
-    } else {
-      // Fade out when scrolling back up or when content should be hidden
-      setFadeIn(0);
-    }
+    // Always show content when menu item is clicked or when not in thewindow section
+    setIsVisible(shouldShow);
+    setFadeIn(shouldShow ? 1 : 0);
     
     // Debug logging for content switching
     if (showContent && currentSection !== "thewindow") {
       console.log("ContentScene - Should show content for section:", currentSection, "fadeIn:", fadeIn, "animationProgress:", animationProgress);
     }
 
-    // Don't return early if contact form is selected
-    if (!shouldShow && currentSection !== "contact") return;
+    // Don't show content scene if not needed
+    if (!shouldShow) return;
 
     // Content changes are handled by App.jsx, not here
     // This prevents conflicts with the main scroll logic
@@ -192,9 +156,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       contentRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.4) * 0.01;
     }
 
-    // Keep video background stable
+    // Add dynamic zoom effect to content video - Scene 2 behavior
     if (videoMeshRef.current) {
-      videoMeshRef.current.scale.set(scale[0], scale[1], 1);
+      const baseZoom = 1.0;
+      // Subtle zoom effect for content scene
+      const zoomEffect = 1.0 + (Math.sin(state.clock.elapsedTime * 0.2) * 0.02); // Gentle breathing effect
+      videoMeshRef.current.scale.set(scale[0] * baseZoom * zoomEffect, scale[1] * baseZoom * zoomEffect, 1);
     }
 
     // Notify parent of section change
@@ -211,11 +178,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     }
   }, [currentSection, showContent]);
 
-  // Always render contact form when selected, otherwise use normal visibility logic
-  if (currentSection === "contact") {
-  } else if (!isVisible) {
-    return null;
-  }
+  // Content scene is always visible when shouldShow is true (checked above)
 
   return (
     <group ref={contentRef} position={[0, 0, 0]}>
@@ -223,14 +186,10 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       {/* Background Video - Second video for content sections */}
       <mesh ref={videoMeshRef} scale={scale} position={[0, 0, 0.9]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={currentSection === "contact" ? 1 : fadeIn} />
+        <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={1} />
       </mesh>
 
-      {/* Black Overlay Layer */}
-      <mesh scale={scale} position={[0, 0, 0.91]}>
-        <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial color="black" transparent opacity={currentSection === "contact" ? 0.6 : 0.6 * fadeIn} />
-      </mesh>
+      {/* Remove dark overlay to show particles clearly */}
 
       {/* Star Field for Content Section */}
       <StarField scroll={scroll} />
@@ -258,45 +217,8 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         section="content"
       />
 
-      {/* Conditional Content Rendering */}
-      {currentSection === "contact" ? (
-        // Contact Form
-        <>
-          <Html
-            position={[0, 0, 0.98]}
-            transform
-            style={{
-              width: viewport.width * 0.6,
-              height: viewport.height * 0.8,
-              pointerEvents: 'auto',
-              opacity: 1,
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative'
-            }}
-          >
-            <div style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              border: '2px solid white',
-              borderRadius: '10px',
-              padding: '20px',
-              color: 'white',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>CONTACT FORM</h1>
-             
-              <ContactForm />
-            </div>
-          </Html>
-        </>
-      ) : (
+      {/* Content Text Display (skip contact since it's handled by overlay) */}
+      {currentSection !== "contact" && (
         <>
           {/* Title Text */}
           <Text
@@ -361,24 +283,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         <meshBasicMaterial color="#ffffff" transparent opacity={0.6 * animationProgress * fadeIn} />
       </mesh>
 
-      {/* Floating Particles */}
-      {Array.from({ length: 25 }).map((_, i) => (
-        <mesh
-          key={i}
-          position={[
-            (Math.random() - 0.5) * 2.5,
-            (Math.random() - 0.5) * 2.5,
-            (Math.random() - 0.5) * 0.8 + 0.95
-          ]}
-        >
-          <sphereGeometry args={[0.003 + Math.random() * 0.004, 6, 6]} />
-          <meshBasicMaterial
-            color={i % 3 === 0 ? "#ffffff" : i % 3 === 1 ? "#fff" : "#fff"}
-            transparent
-            opacity={0.4 * animationProgress * fadeIn}
-          />
-        </mesh>
-      ))}
+      {/* Remove floating particles from content scene */}
 
     </group>
   );

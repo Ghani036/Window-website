@@ -27,7 +27,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
 
   const handleClick = (key) => {
     console.log("Menu - handleClick called with key:", key);
-    if (onMenuClick && !isTransitioning) {
+    if (onMenuClick) {
       onMenuClick(key);
     }
     
@@ -45,7 +45,9 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
   // 1. In content sections, OR
   // 2. All items are already visible (visibleSubs >= 9)
   // 3. Menu item was clicked (showContent is true)
-  const effectiveVisibleSubs = (isInContentSection || visibleSubs >= 9) ? 9 : Math.max(1, visibleSubs);
+  const effectiveVisibleSubs = (isInContentSection || visibleSubs >= 9) ? 
+    9 : // Show all 9 sub-items when in content or all are visible
+    Math.max(1, Math.min(visibleSubs, 9)); // Clamp between 1 and 9
 
   return (
     <>
@@ -90,7 +92,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
                 />
                 <motion.span
                   className={`font-avenir md:pl-0 pl-4 text-[14px] inline-block md:w-max w-[150px] cursor-pointer border-b-2 border-white/90 relative z-10 transition-all duration-300 ${
-                    isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+                    isTransitioning ? 'opacity-50' : 'opacity-100'
                   }`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: isTransitioning ? 0.5 : 1, y: 0 }}
@@ -132,7 +134,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
                       />
                       <motion.span
                         className={`relative z-10 pl-4 text-xs cursor-pointer transition-all duration-300 ${
-                          isTransitioning ? 'opacity-50 pointer-events-none' : 'opacity-100'
+                          isTransitioning ? 'opacity-50' : 'opacity-100'
                         }`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: isTransitioning ? 0.5 : 1, y: 0 }}

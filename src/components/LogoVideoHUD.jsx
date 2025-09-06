@@ -20,22 +20,25 @@ export default function LogoVideoHUD({ scroll, showContent }) {
     
     const t = scroll.offset;
 
-    // 🔹 Logo reveal ONLY in first scene - multiple safety checks
+    // 🔹 Logo reveal ONLY in first scene - step by step reveal
     // 1. Don't show if content is being shown
-    // 2. Don't show if scroll is past 40% (first scene only)
+    // 2. Don't show if scroll is past 50% (first scene only)
     // 3. Don't show if we're in any content section
-    if (t >= 0.4) return; // Completely hide logo after 40% scroll progress (first scene only)
+    if (t >= 0.5) return; // Completely hide logo after 50% scroll progress (first scene only)
     
-    const revealProgress = smoothstepRange(t, 0.05, 0.35);
+    // Step-by-step logo reveal with smoother progression
+    const revealProgress = smoothstepRange(t, 0.01, 0.35); // Start earlier, end earlier for menu space
 
-    // Scrub video based on scroll progress
+    // Scrub video based on scroll progress for step-by-step reveal
     if (videoRef && videoRef.readyState >= 2 && videoRef.duration) {
       videoRef.currentTime = videoRef.duration * revealProgress;
     }
 
     if (meshRef.current) {
-      // Show logo during reveal, fade out after
-      const opacity = revealProgress < 1 ? revealProgress : Math.max(0, 1 - smoothstepRange(t, 0.35, 0.45));
+      // Show logo during reveal, keep visible longer for menu to appear
+      const opacity = revealProgress < 1 ? 
+        Math.min(revealProgress * 1.5, 1) : // Faster fade in
+        Math.max(0, 1 - smoothstepRange(t, 0.35, 0.45)); // Fade out to make room for menu
       meshRef.current.material.opacity = opacity;
     }
   });

@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export default function WhiteParticleSystem({ 
+export default function FloatingParticles({ 
   scroll, 
   section = 'first', 
   showContent = false, 
@@ -23,8 +23,8 @@ export default function WhiteParticleSystem({
           (Math.random() - 0.5) * 60, // Much larger range
           (Math.random() - 0.5) * 60  // Much larger range
         ],
-        size: Math.random() * 0.015 + 0.008, // Smaller, cleaner size
-        speed: Math.random() * 0.15 + 0.08, // Better speed
+        size: 0.08, // Fixed 8px size
+        speed: Math.random() * 0.05 + 0.03, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -38,8 +38,8 @@ export default function WhiteParticleSystem({
           (Math.random() - 0.5) * 65, // Much larger range
           (Math.random() - 0.5) * 65  // Much larger range
         ],
-        size: Math.random() * 0.01 + 0.005, // Smaller, cleaner size
-        speed: Math.random() * 0.2 + 0.1, // Better speed
+        size: 0.08, // Fixed 8px size
+        speed: Math.random() * 0.08 + 0.05, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -53,8 +53,8 @@ export default function WhiteParticleSystem({
           (Math.random() - 0.5) * 70, // Much larger range
           (Math.random() - 0.5) * 70  // Much larger range
         ],
-        size: Math.random() * 0.008 + 0.003, // Smaller, cleaner size
-        speed: Math.random() * 0.25 + 0.15, // Better speed
+        size: 0.08, // Fixed 8px size
+        speed: Math.random() * 0.1 + 0.08, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -71,18 +71,18 @@ export default function WhiteParticleSystem({
     let visibility = 1;
     let scrollEffect = 0;
 
+    // Floating particles behavior based on scene
     if (section === 'first') {
-      // fade out & move away
-      visibility = Math.max(0, 1 - scrollProgress * 1.5);
-      scrollEffect = scrollProgress * 0.8; // Reduced scroll effect
+      // Keep floating particles visible in first scene
+      visibility = Math.max(0.4, 1 - scrollProgress * 0.6);
+      scrollEffect = scrollProgress * 0.15;
+    } else if (section === 'content') {
+      // Show floating particles in content scene too
+      visibility = showContent ? 0.5 : 0;
+      scrollEffect = 0;
     } else {
-      // fade in when content visible
-      if (showContent || visibleSubs >= 9) {
-        visibility = Math.min(1, (scrollProgress - 0.2) * 2);
-      } else {
-        visibility = 0;
-      }
-      scrollEffect = -scrollProgress * 0.5; // Reduced scroll effect
+      visibility = 0;
+      scrollEffect = 0;
     }
 
     // Update particles
@@ -92,10 +92,10 @@ export default function WhiteParticleSystem({
 
       const base = data.basePos;
 
-      // Smoother, more random floating motion
-      const fx = Math.sin(time * data.speed * 0.4 + data.phase) * 0.8 + Math.cos(time * data.speed * 0.3 + data.phase) * 0.4;
-      const fy = Math.cos(time * data.speed * 0.45 + data.phase) * 0.8 + Math.sin(time * data.speed * 0.35 + data.phase) * 0.4;
-      const fz = Math.sin(time * data.speed * 0.5 + data.phase) * 0.8 + Math.cos(time * data.speed * 0.4 + data.phase) * 0.4;
+      // Very slow, gentle floating motion
+      const fx = Math.sin(time * data.speed * 0.2 + data.phase) * 0.3 + Math.cos(time * data.speed * 0.15 + data.phase) * 0.2;
+      const fy = Math.cos(time * data.speed * 0.25 + data.phase) * 0.3 + Math.sin(time * data.speed * 0.18 + data.phase) * 0.2;
+      const fz = Math.sin(time * data.speed * 0.22 + data.phase) * 0.3 + Math.cos(time * data.speed * 0.2 + data.phase) * 0.2;
 
       // Base position + slow floating
       const currentX = base[0] + fx;

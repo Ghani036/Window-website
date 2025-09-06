@@ -22,7 +22,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       // Handle going back to first section when scrolling up
       // More responsive threshold: allow going back when scroll is in the first 30% of the scroll range
       // and user is actively scrolling up from content section
-      if (progress < 0.3 && showContent && (isScrollingUp || progress < 0.1)) {
+      if (progress < 0.3 && showContent && isScrollingUp) {
         onBackToFirstSection();
         return;
       }
@@ -32,17 +32,33 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       if (visibleSubs >= 9) {
         setVisibleSubs(9);
         // Auto-transition to content section when all menu items are visible and scrolled further
-        if (!showContent && progress > 0.7) {
+        if (!showContent && progress > 0.6) {
           setShowContent(true);
         }
-        return;
+        // Don't return here - allow further scrolling for content switching
       }
       
-      // Improved scroll progression for smoother menu reveal
-      const firstSceneProgress = Math.min(progress / 0.6, 1);
-      const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
+      // Handle content section switching in second scene
+      if (showContent && progress > 0.5) {
+        // Map scroll progress to content sections
+        const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
+        const contentProgress = Math.max(0, (progress - 0.5) / 0.5); // 0.5 to 1.0 mapped to 0 to 1
+        const sectionIndex = Math.floor(contentProgress * contentSections.length);
+        const targetSection = contentSections[Math.min(sectionIndex, contentSections.length - 1)];
+        
+        if (targetSection && currentSection !== targetSection && currentSection !== "contact") {
+          console.log("Auto-switching to section:", targetSection, "at progress:", progress);
+          setCurrentSection(targetSection);
+        }
+      }
       
-      setVisibleSubs(newVisibleSubs);
+      // Improved scroll progression for smoother menu reveal (only in first scene)
+      if (!showContent) {
+        // Logo appears first, then menu items step by step
+        const firstSceneProgress = Math.min(progress / 0.6, 1); // Extended range for more gradual reveal
+        const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
+        setVisibleSubs(newVisibleSubs);
+      }
     };
 
     if (scroll && scroll.el) {
@@ -104,10 +120,21 @@ export default function App() {
     }
     
     // Scroll to show content section for other sections
+    // Find the scroll progress that corresponds to this section
+    const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
+    const sectionIndex = contentSections.indexOf(sectionId);
+    
     const scrollElement = document.querySelector('.scroll-container');
     if (scrollElement) {
+      let targetScrollPercent = 0.7; // Default to start of content section
+      
+      if (sectionIndex >= 0) {
+        // Calculate specific scroll position for this section
+        targetScrollPercent = 0.5 + (sectionIndex / contentSections.length) * 0.5;
+      }
+      
       scrollElement.scrollTo({
-        top: scrollElement.scrollHeight * 0.7, // Scroll to show content
+        top: scrollElement.scrollHeight * targetScrollPercent,
         behavior: 'smooth'
       });
     }
@@ -166,7 +193,7 @@ export default function App() {
 
       <div className="relative w-full h-screen scroll-container">
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
-          <ScrollControls pages={15} damping={0.2} distance={1} horizontal={false}>
+          <ScrollControls pages={20} damping={0.03} distance={1} horizontal={false}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 
               setCurrentSection={setCurrentSection}

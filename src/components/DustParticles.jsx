@@ -41,8 +41,8 @@ export default function DustParticles({
       moveData[i6 + 4] = (Math.random() - 0.5) * 0.005; // vy
       moveData[i6 + 5] = (Math.random() - 0.5) * 0.005; // vz
 
-      // Larger dust particle sizes
-      sizeArr[i] = Math.random() * 0.015 + 0.008;
+      // Much larger dust particles for better visibility
+      sizeArr[i] = 1.2; // Increased size for better visibility
     }
     return { positions: pos, sizes: sizeArr, movementData: moveData };
   }, []);
@@ -58,18 +58,18 @@ export default function DustParticles({
     let visibility = 1;
     let scrollEffect = 0;
 
+    // Dust particles behavior based on scene
     if (section === "first") {
-      // fade out & push away
-      visibility = Math.max(0, 1 - scrollProgress * 1.2);
-      scrollEffect = scrollProgress * 0.3;
+      // Keep dust particles visible in first scene
+      visibility = Math.max(0.8, 1 - scrollProgress * 0.2); // More visible
+      scrollEffect = scrollProgress * 0.05;
+    } else if (section === "content") {
+      // Show dust particles in content scene too
+      visibility = showContent ? 0.9 : 0; // More visible in content scene
+      scrollEffect = 0;
     } else {
-      // fade in & pull inward
-      if (showContent || visibleSubs >= 9) {
-        visibility = Math.min(1, (scrollProgress - 0.2) * 1.5);
-      } else {
-        visibility = 0;
-      }
-      scrollEffect = -scrollProgress * 0.2;
+      visibility = 0;
+      scrollEffect = 0;
     }
 
     for (let i = 0; i < 800; i++) {
@@ -84,15 +84,15 @@ export default function DustParticles({
       const velY = movementData[i6 + 4];
       const velZ = movementData[i6 + 5];
 
-      // Very gentle floating movement for dust
-      const floatX = Math.sin(time * 0.2 + i * 0.01) * 0.3;
-      const floatY = Math.cos(time * 0.25 + i * 0.015) * 0.3;
-      const floatZ = Math.sin(time * 0.18 + i * 0.02) * 0.3;
+      // Very slow, gentle floating movement for dust
+      const floatX = Math.sin(time * 0.05 + i * 0.01) * 0.1;
+      const floatY = Math.cos(time * 0.06 + i * 0.015) * 0.1;
+      const floatZ = Math.sin(time * 0.04 + i * 0.02) * 0.1;
 
-      // Apply velocity-based drift
-      const driftX = velX * time * 0.2;
-      const driftY = velY * time * 0.2;
-      const driftZ = velZ * time * 0.2;
+      // Apply very slow velocity-based drift
+      const driftX = velX * time * 0.05;
+      const driftY = velY * time * 0.05;
+      const driftZ = velZ * time * 0.05;
 
       // Calculate current position
       const currentX = baseX + floatX + driftX;
@@ -120,9 +120,9 @@ export default function DustParticles({
         pos[i3 + 2] = currentZ;
       }
 
-      // Subtle size variation
+      // Keep much larger size with subtle variation
       if (sizeArr) {
-        sizeArr[i] = 0.003 + Math.abs(Math.sin(time * 0.1 + i * 0.05)) * 0.004;
+        sizeArr[i] = 1.2 + Math.abs(Math.sin(time * 0.1 + i * 0.05)) * 0.2; // Increased size for visibility
       }
     }
 
@@ -131,8 +131,8 @@ export default function DustParticles({
       pointsRef.current.geometry.attributes.size.needsUpdate = true;
     }
 
-    // Opacity based on scroll
-    pointsRef.current.material.opacity = visibility * 0.4;
+    // Opacity based on scroll - make more visible
+    pointsRef.current.material.opacity = visibility * 0.8;
 
     // Very slow rotation for subtle 3D effect
     if (groupRef.current) {
@@ -159,10 +159,10 @@ export default function DustParticles({
         />
         </bufferGeometry>
         <pointsMaterial
-          size={0.02}
-          color={"#cccccc"}
+          size={1.2}
+          color={"#ffffff"}
           transparent
-          opacity={0.4}
+          opacity={1.0}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}

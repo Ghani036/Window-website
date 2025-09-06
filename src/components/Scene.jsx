@@ -7,6 +7,7 @@ import StarField from "./StarField";
 import ParticleSystem from "./ParticleSystem";
 import FloatingParticles from "./FloatingParticles";
 import DustParticles from "./DustParticles";
+import LogoVideoHUD from "./LogoVideoHUD";
 
 export default function Scene({ showContent, visibleSubs }) {
   const scroll = useScroll();
@@ -16,6 +17,9 @@ export default function Scene({ showContent, visibleSubs }) {
       <VideoBackground scroll={scroll} showContent={showContent} visibleSubs={visibleSubs} />
       <CameraRig scroll={scroll} />
       <StarField scroll={scroll} />
+      
+      {/* Logo Reveal for Scene 1 */}
+      <LogoVideoHUD scroll={scroll} showContent={showContent} />
       
       {/* Particle Systems for First Section */}
       <ParticleSystem
