@@ -153,49 +153,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
           </div>
         ))}
 
-
-
-        <div className={`relative md:w-max md:hidden transform transition-all duration-500 ease-in-out `}>
-          <Lottie
-            animationData={dustAnimation}
-            loop={false}
-            className="absolute inset-0 pointer-events-none"
-            style={{ width: 120, height: 120 }}
-          />
-          <motion.span
-            className="font-avenir text-white inline-block md:w-max w-[150px]  md:pl-0 pl-4 text-[14px] border-b-2  border-white/90 relative z-10"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            onClick={() => handleClick("contact")}
-          >
-            CONTACT
-          </motion.span>
-
-          <motion.div
-            className="text-sm relative flex items-center text-gray-300  px-2"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="relative w-max">
-              <Lottie
-                animationData={dustAnimation}
-                loop={false}
-                className="absolute inset-0 pointer-events-none"
-                style={{ width: 120, height: 120 }}
-              />
-              <motion.span
-                className=" relative z-10 pl-4 text-xs cursor-pointer "
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                - Send Us Some Good Gifts
-              </motion.span>
-            </div>
-          </motion.div>
-        </div>
+      
       </motion.div>
     </>
 
