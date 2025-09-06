@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
@@ -8,14 +8,21 @@ import ContactForm from "./components/ContactForm";
 
 function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent }) {
   const scroll = useScroll();
+  const lastScrollPosition = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const progress = scroll.offset;
       const totalSubs = 9;
       
+      // Track scroll direction for better detection
+      const isScrollingUp = progress < lastScrollPosition.current;
+      lastScrollPosition.current = progress;
+      
       // Handle going back to first section when scrolling up
-      if (progress < 0.03 && showContent) {
+      // More responsive threshold: allow going back when scroll is in the first 30% of the scroll range
+      // and user is actively scrolling up from content section
+      if (progress < 0.3 && showContent && (isScrollingUp || progress < 0.1)) {
         onBackToFirstSection();
         return;
       }
@@ -107,12 +114,16 @@ export default function App() {
   };
 
   const handleBackToFirstSection = () => {
+    console.log("=== GOING BACK TO FIRST SECTION ===");
     setIsTransitioning(true);
     
+    // Reset content state immediately for better responsiveness
+    setCurrentSection("thewindow");
+    setShowContent(false);
+    
     setTimeout(() => {
-      setCurrentSection("thewindow");
-      setShowContent(false);
       setIsTransitioning(false);
+      console.log("=== BACK TO FIRST SECTION COMPLETE ===");
       
       // Scroll back to top
       const scrollElement = document.querySelector('.scroll-container');

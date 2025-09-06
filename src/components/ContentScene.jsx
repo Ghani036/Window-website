@@ -142,14 +142,16 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
       // Force visibility for contact form
       setIsVisible(true);
     } else {
-      setIsVisible(shouldShow);
+      // Improved visibility logic: hide content when scrolling back to first section
+      // This ensures content disappears when user scrolls back up
+      setIsVisible(shouldShow && progress > 0.2);
     }
 
     // Smooth fade in effect
     if (currentSection === "contact") {
       // Contact form is always fully visible
       setFadeIn(1);
-    } else if (shouldShow) {
+    } else if (shouldShow && progress > 0.2) {
       if (showContent) {
         // If menu item was clicked, show immediately
         setFadeIn(1);
@@ -162,6 +164,7 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         setFadeIn(fadeProgress);
       }
     } else {
+      // Fade out when scrolling back up or when content should be hidden
       setFadeIn(0);
     }
     
