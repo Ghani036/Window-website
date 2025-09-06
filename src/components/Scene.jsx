@@ -19,7 +19,7 @@ export default function Scene({ showContent, visibleSubs }) {
       <StarField scroll={scroll} />
       
       {/* Logo Reveal for Scene 1 */}
-      <LogoVideoHUD scroll={scroll} showContent={showContent} />
+      {/* <LogoVideoHUD scroll={scroll} showContent={showContent} /> */}
       
       {/* Particle Systems for First Section */}
       <ParticleSystem

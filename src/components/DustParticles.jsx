@@ -42,7 +42,7 @@ export default function DustParticles({
       moveData[i6 + 5] = (Math.random() - 0.5) * 0.005; // vz
 
       // Much larger dust particles for better visibility
-      sizeArr[i] = 1.2; // Increased size for better visibility
+      sizeArr[i] = 2.0; // Even larger size for better visibility
     }
     return { positions: pos, sizes: sizeArr, movementData: moveData };
   }, []);
@@ -61,11 +61,11 @@ export default function DustParticles({
     // Dust particles behavior based on scene
     if (section === "first") {
       // Keep dust particles visible in first scene
-      visibility = Math.max(0.8, 1 - scrollProgress * 0.2); // More visible
+      visibility = Math.max(0.9, 1 - scrollProgress * 0.1); // Much more visible
       scrollEffect = scrollProgress * 0.05;
     } else if (section === "content") {
       // Show dust particles in content scene too
-      visibility = showContent ? 0.9 : 0; // More visible in content scene
+      visibility = showContent ? 1.0 : 0; // Fully visible in content scene
       scrollEffect = 0;
     } else {
       visibility = 0;
@@ -122,7 +122,7 @@ export default function DustParticles({
 
       // Keep much larger size with subtle variation
       if (sizeArr) {
-        sizeArr[i] = 1.2 + Math.abs(Math.sin(time * 0.1 + i * 0.05)) * 0.2; // Increased size for visibility
+        sizeArr[i] = 2.0 + Math.abs(Math.sin(time * 0.1 + i * 0.05)) * 0.3; // Even larger size for visibility
       }
     }
 
@@ -132,7 +132,7 @@ export default function DustParticles({
     }
 
     // Opacity based on scroll - make more visible
-    pointsRef.current.material.opacity = visibility * 0.8;
+    pointsRef.current.material.opacity = visibility * 1.0;
 
     // Very slow rotation for subtle 3D effect
     if (groupRef.current) {
@@ -159,7 +159,7 @@ export default function DustParticles({
         />
         </bufferGeometry>
         <pointsMaterial
-          size={1.2}
+          size={2.0}
           color={"#ffffff"}
           transparent
           opacity={1.0}

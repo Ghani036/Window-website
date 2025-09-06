@@ -42,7 +42,7 @@ export default function ParticleSystem({
       moveData[i6 + 5] = (Math.random() - 0.5) * 0.005; // vz - very slow, smooth movement
 
       // Larger particles for better visibility
-      sizeArr[i] = 0.2; // Increased size for better visibility
+      sizeArr[i] = 0.4; // Even larger size for better visibility
     }
     return { positions: pos, sizes: sizeArr, movementData: moveData };
   }, [count]);
@@ -61,11 +61,11 @@ export default function ParticleSystem({
     // Particles behavior based on scene
     if (section === "first") {
       // Keep particles visible in first scene
-      visibility = Math.max(0.4, 1 - scrollProgress * 0.6);
+      visibility = Math.max(0.8, 1 - scrollProgress * 0.2);
       scrollEffect = scrollProgress * 0.15;
     } else if (section === "content") {
       // Show particles in content scene too
-      visibility = showContent ? 0.6 : 0;
+      visibility = showContent ? 0.9 : 0;
       scrollEffect = 0;
     } else {
       visibility = 0;
@@ -122,7 +122,7 @@ export default function ParticleSystem({
 
       // Keep larger size with subtle variation
       if (sizeArr) {
-        sizeArr[i] = 0.2 + Math.abs(Math.sin(time * 0.15 + i * 0.03)) * 0.05;
+        sizeArr[i] = 0.4 + Math.abs(Math.sin(time * 0.15 + i * 0.03)) * 0.1;
       }
     }
 
@@ -132,7 +132,7 @@ export default function ParticleSystem({
     }
 
     // opacity based on scroll
-    pointsRef.current.material.opacity = visibility * 0.8;
+    pointsRef.current.material.opacity = visibility * 1.0;
 
     // Very slow rotation for subtle 3D effect
     if (groupRef.current) {
@@ -159,10 +159,10 @@ export default function ParticleSystem({
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.2}
+          size={0.4}
           color={"white"}
           transparent
-          opacity={0.9}
+          opacity={1.0}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}

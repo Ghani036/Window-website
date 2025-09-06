@@ -23,7 +23,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 60, // Much larger range
           (Math.random() - 0.5) * 60  // Much larger range
         ],
-        size: 0.15, // Increased size for visibility
+        size: 0.25, // Even larger size for visibility
         speed: Math.random() * 0.05 + 0.03, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
@@ -38,7 +38,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 65, // Much larger range
           (Math.random() - 0.5) * 65  // Much larger range
         ],
-        size: 0.12, // Increased size for visibility
+        size: 0.2, // Even larger size for visibility
         speed: Math.random() * 0.08 + 0.05, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
@@ -53,7 +53,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 70, // Much larger range
           (Math.random() - 0.5) * 70  // Much larger range
         ],
-        size: 0.1, // Increased size for visibility
+        size: 0.15, // Even larger size for visibility
         speed: Math.random() * 0.1 + 0.08, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
@@ -74,11 +74,11 @@ export default function FloatingParticles({
     // Floating particles behavior based on scene
     if (section === 'first') {
       // Keep floating particles visible in first scene
-      visibility = Math.max(0.4, 1 - scrollProgress * 0.6);
+      visibility = Math.max(0.8, 1 - scrollProgress * 0.2);
       scrollEffect = scrollProgress * 0.15;
     } else if (section === 'content') {
       // Show floating particles in content scene too
-      visibility = showContent ? 0.5 : 0;
+      visibility = showContent ? 0.9 : 0;
       scrollEffect = 0;
     } else {
       visibility = 0;
@@ -126,7 +126,7 @@ export default function FloatingParticles({
       }
 
       // Opacity
-      particle.material.opacity = visibility * 0.8;
+      particle.material.opacity = visibility * 1.0;
 
       // Very slow rotations for subtle sparkle
       particle.rotation.x += 0.0005;
@@ -147,8 +147,8 @@ export default function FloatingParticles({
           <meshBasicMaterial
             color={'white'}
             transparent
-            opacity={0.8}
-            blending={THREE.NormalBlending}
+            opacity={1.0}
+            blending={THREE.AdditiveBlending}
             depthWrite={false}
             alphaTest={0.1}
           />
