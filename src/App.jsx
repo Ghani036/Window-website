@@ -12,52 +12,60 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
 
   useEffect(() => {
     const handleScroll = () => {
+      if (isTransitioning) return;
+      
       const progress = scroll.offset;
       const totalSubs = 9;
       
-      // Track scroll direction for better detection
+      // Track scroll direction
       const isScrollingUp = progress < lastScrollPosition.current;
       lastScrollPosition.current = progress;
       
-      // Handle going back to first section when scrolling up
-      // More responsive threshold: allow going back when scroll is in the first 30% of the scroll range
-      // and user is actively scrolling up from content section
-      if (progress < 0.3 && showContent && isScrollingUp) {
-        onBackToFirstSection();
+      console.log("Scroll progress:", progress, "showContent:", showContent, "currentSection:", currentSection);
+      
+      // Simple logic: Scene 1 (0-60%), Scene 2 (60-100%)
+      
+      // Scene 1: Logo + Menu progression (0% to 60%)
+      if (progress <= 0.6) {
+        // Force Scene 1 state
+        if (showContent) {
+          setShowContent(false);
+          setCurrentSection("thewindow");
+        }
+        
+        // Progressive menu reveal
+        const menuProgress = Math.min(progress / 0.6, 1);
+        const newVisibleSubs = Math.max(1, Math.floor(menuProgress * totalSubs) + 1);
+        setVisibleSubs(Math.min(newVisibleSubs, totalSubs));
         return;
       }
       
-      // Menu progression based on scroll
-      // Once all items are visible (visibleSubs >= 9), keep them visible
-      if (visibleSubs >= 9) {
-        setVisibleSubs(9);
-        // Auto-transition to content section when all menu items are visible and scrolled further
-        if (!showContent && progress > 0.6) {
+      // Scene 2: Content sections (60% to 100%)
+      if (progress > 0.6) {
+        // Force Scene 2 state if all menu items are visible
+        if (!showContent && visibleSubs >= totalSubs) {
           setShowContent(true);
+          setCurrentSection("thefounder");
         }
-        // Don't return here - allow further scrolling for content switching
-      }
-      
-      // Handle content section switching in second scene
-      if (showContent && progress > 0.5) {
-        // Map scroll progress to content sections
-        const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
-        const contentProgress = Math.max(0, (progress - 0.5) / 0.5); // 0.5 to 1.0 mapped to 0 to 1
-        const sectionIndex = Math.floor(contentProgress * contentSections.length);
-        const targetSection = contentSections[Math.min(sectionIndex, contentSections.length - 1)];
         
-        if (targetSection && currentSection !== targetSection && currentSection !== "contact") {
-          console.log("Auto-switching to section:", targetSection, "at progress:", progress);
-          setCurrentSection(targetSection);
+        // Content switching logic (only if in Scene 2)
+        if (showContent) {
+          const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
+          const contentProgress = (progress - 0.6) / 0.4; // 0.6 to 1.0 mapped to 0 to 1
+          const sectionIndex = Math.floor(contentProgress * contentSections.length);
+          const targetSection = contentSections[Math.min(sectionIndex, contentSections.length - 1)];
+          
+          if (targetSection && currentSection !== targetSection && currentSection !== "contact") {
+            console.log("Scene 2: Switching to section:", targetSection);
+            setCurrentSection(targetSection);
+          }
         }
-      }
-      
-      // Improved scroll progression for smoother menu reveal (only in first scene)
-      if (!showContent) {
-        // Logo appears first, then menu items step by step
-        const firstSceneProgress = Math.min(progress / 0.6, 1); // Extended range for more gradual reveal
-        const newVisibleSubs = Math.max(1, Math.floor(firstSceneProgress * totalSubs) + 1);
-        setVisibleSubs(newVisibleSubs);
+        
+        // Back to Scene 1 only if scrolling up AND at very beginning
+        if (progress < 0.1 && isScrollingUp && showContent) {
+          console.log("Going back to Scene 1");
+          onBackToFirstSection();
+        }
       }
     };
 
@@ -66,7 +74,8 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       handleScroll();
       return () => scroll.el.removeEventListener("scroll", handleScroll);
     }
-  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection]);
+  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection, currentSection, isTransitioning, setShowContent, setCurrentSection]);
+
 
   const handleSectionReached = (sectionId) => {
     setCurrentSection(sectionId);
@@ -74,8 +83,8 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
 
   return (
     <>
-      <Scene showContent={showContent} visibleSubs={visibleSubs} />
-      <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} isTransitioning={isTransitioning} />
+      {!showContent && <Scene showContent={showContent} visibleSubs={visibleSubs} />}
+      {showContent && <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} isTransitioning={isTransitioning} />}
     </>
   );
 }
@@ -92,45 +101,32 @@ export default function App() {
   }, [currentSection, showContent, isTransitioning]);
 
   const handleMenuClick = (sectionId) => {
-    console.log("=== MENU CLICK DEBUG ===");
-    console.log("Menu clicked:", sectionId); // Debug log
-    console.log("Current state - currentSection:", currentSection, "showContent:", showContent);
+    console.log("Menu clicked:", sectionId);
     
-    // Start transition
-    setIsTransitioning(true);
-    
-    // Change content immediately for better responsiveness
-    setCurrentSection(sectionId);
-    setShowContent(true);
-    
-    console.log("After setting - currentSection:", sectionId, "showContent: true");
-    
-    // End transition after a brief delay
-    setTimeout(() => {
-      setIsTransitioning(false);
-      console.log("Transition ended - currentSection should be:", sectionId);
-      console.log("=== END MENU CLICK DEBUG ===");
-    }, 300);
-    
-    // For contact form, don't scroll - just show it
+    // For contact form
     if (sectionId === "contact") {
-      console.log("Contact form selected - showing form");
-      console.log("=== END MENU CLICK DEBUG ===");
+      setCurrentSection(sectionId);
+      setShowContent(true);
       return;
     }
     
-    // Scroll to show content section for other sections
-    // Find the scroll progress that corresponds to this section
+    // For content sections - go to Scene 2
+    setIsTransitioning(true);
+    setShowContent(true);
+    setCurrentSection(sectionId);
+    setVisibleSubs(9);
+    
+    // Calculate scroll position in Scene 2 range (60% to 100%)
     const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
     const sectionIndex = contentSections.indexOf(sectionId);
     
     const scrollElement = document.querySelector('.scroll-container');
     if (scrollElement) {
-      let targetScrollPercent = 0.7; // Default to start of content section
+      let targetScrollPercent = 0.65; // Default to early Scene 2
       
       if (sectionIndex >= 0) {
-        // Calculate specific scroll position for this section
-        targetScrollPercent = 0.5 + (sectionIndex / contentSections.length) * 0.5;
+        // Map to 60% - 100% range
+        targetScrollPercent = 0.6 + (sectionIndex / contentSections.length) * 0.4;
       }
       
       scrollElement.scrollTo({
@@ -138,28 +134,25 @@ export default function App() {
         behavior: 'smooth'
       });
     }
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 600);
   };
 
   const handleBackToFirstSection = () => {
     console.log("=== GOING BACK TO FIRST SECTION ===");
     setIsTransitioning(true);
     
-    // Reset content state immediately for better responsiveness
+    // Reset states to Scene 1
     setCurrentSection("thewindow");
     setShowContent(false);
+    setVisibleSubs(9); // Keep all menu items visible
     
+    // Quick transition without auto-scroll
     setTimeout(() => {
       setIsTransitioning(false);
       console.log("=== BACK TO FIRST SECTION COMPLETE ===");
-      
-      // Scroll back to top
-      const scrollElement = document.querySelector('.scroll-container');
-      if (scrollElement) {
-        scrollElement.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      }
     }, 200);
   };
 
@@ -193,7 +186,7 @@ export default function App() {
 
       <div className="relative w-full h-screen scroll-container">
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
-          <ScrollControls pages={20} damping={0.03} distance={1} horizontal={false}>
+          <ScrollControls pages={15} damping={0.05} distance={1} horizontal={false}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 
               setCurrentSection={setCurrentSection}

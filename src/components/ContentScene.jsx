@@ -125,19 +125,18 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
     // Let content video play naturally - no scroll control
     // Video will loop automatically
 
-    // Simplified visibility logic - show content scene when needed
-    const shouldShow = showContent || currentSection !== "thewindow";
+    // Only show content scene when explicitly in Scene 2
+    const shouldShow = showContent;
     
-    // Always show content when menu item is clicked or when not in thewindow section
     setIsVisible(shouldShow);
     setFadeIn(shouldShow ? 1 : 0);
     
-    // Debug logging for content switching
-    if (showContent && currentSection !== "thewindow") {
-      console.log("ContentScene - Should show content for section:", currentSection, "fadeIn:", fadeIn, "animationProgress:", animationProgress);
+    // Debug logging
+    if (shouldShow) {
+      console.log("ContentScene - Showing section:", currentSection);
     }
 
-    // Don't show content scene if not needed
+    // Don't render if not in Scene 2
     if (!shouldShow) return;
 
     // Content changes are handled by App.jsx, not here
@@ -189,14 +188,18 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         <meshBasicMaterial map={contentTexture} toneMapped={false} transparent opacity={1} />
       </mesh>
 
-      {/* Remove dark overlay to show particles clearly */}
+      {/* Black overlay for beautification */}
+      <mesh scale={[100, 100, 1]} position={[0, 0, 0.91]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.5} />
+      </mesh>
 
       {/* Star Field for Content Section */}
       <StarField scroll={scroll} />
 
       {/* Particle Systems for Content Section */}
       <ParticleSystem
-        count={1500}
+        count={2000}
         scroll={scroll}
         showContent={showContent}
         visibleSubs={visibleSubs}

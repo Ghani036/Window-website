@@ -23,7 +23,7 @@ export default function Scene({ showContent, visibleSubs }) {
       
       {/* Particle Systems for First Section */}
       <ParticleSystem
-        count={1500}
+        count={2000}
         scroll={scroll}
         showContent={showContent}
         visibleSubs={visibleSubs}

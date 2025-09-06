@@ -26,8 +26,8 @@ export default function VideoBackground({ scroll, showContent, visibleSubs }) {
     // Smooth zoom in as you scroll down, zoom out when scrolling up
     const zoomEffect = 1.0 + (t * 0.2); // Increased zoom effect for more dramatic feel
     
-    // Better fade transition - keep video visible during menu reveal, fade when transitioning to content
-    const fadeOut = showContent ? smoothstepRange(t, 0.6, 0.8) : Math.max(0.3, 1 - smoothstepRange(t, 0.8, 1.0));
+    // Simple fade logic - visible in Scene 1, hidden in Scene 2
+    const fadeOut = showContent ? 0 : 1;
 
     if (meshRef.current) {
       meshRef.current.scale.set(scale[0] * baseZoom * zoomEffect, scale[1] * baseZoom * zoomEffect, 1);
@@ -43,7 +43,11 @@ export default function VideoBackground({ scroll, showContent, visibleSubs }) {
         <meshBasicMaterial map={texture} toneMapped={false} transparent />
       </mesh>
 
-      {/* Remove dark overlay to show particles clearly */}
+      {/* Black overlay for beautification */}
+      <mesh scale={[100, 100, 1]} position={[0, 0, 1.1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.5} />
+      </mesh>
     </>
   );
 }

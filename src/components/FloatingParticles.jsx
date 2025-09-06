@@ -23,7 +23,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 60, // Much larger range
           (Math.random() - 0.5) * 60  // Much larger range
         ],
-        size: 0.08, // Fixed 8px size
+        size: 0.15, // Increased size for visibility
         speed: Math.random() * 0.05 + 0.03, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
@@ -38,7 +38,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 65, // Much larger range
           (Math.random() - 0.5) * 65  // Much larger range
         ],
-        size: 0.08, // Fixed 8px size
+        size: 0.12, // Increased size for visibility
         speed: Math.random() * 0.08 + 0.05, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });
@@ -53,7 +53,7 @@ export default function FloatingParticles({
           (Math.random() - 0.5) * 70, // Much larger range
           (Math.random() - 0.5) * 70  // Much larger range
         ],
-        size: 0.08, // Fixed 8px size
+        size: 0.1, // Increased size for visibility
         speed: Math.random() * 0.1 + 0.08, // Much slower, smoother speed
         phase: Math.random() * Math.PI * 2
       });

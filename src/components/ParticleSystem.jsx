@@ -41,8 +41,8 @@ export default function ParticleSystem({
       moveData[i6 + 4] = (Math.random() - 0.5) * 0.005; // vy - very slow, smooth movement
       moveData[i6 + 5] = (Math.random() - 0.5) * 0.005; // vz - very slow, smooth movement
 
-      // Smaller particles for better visual balance
-      sizeArr[i] = 0.08; // Fixed 8px size for all particles
+      // Larger particles for better visibility
+      sizeArr[i] = 0.2; // Increased size for better visibility
     }
     return { positions: pos, sizes: sizeArr, movementData: moveData };
   }, [count]);
@@ -120,9 +120,9 @@ export default function ParticleSystem({
         pos[i3 + 2] = currentZ;
       }
 
-      // Keep 8px size with subtle variation
+      // Keep larger size with subtle variation
       if (sizeArr) {
-        sizeArr[i] = 0.08 + Math.abs(Math.sin(time * 0.15 + i * 0.03)) * 0.01;
+        sizeArr[i] = 0.2 + Math.abs(Math.sin(time * 0.15 + i * 0.03)) * 0.05;
       }
     }
 
@@ -159,12 +159,12 @@ export default function ParticleSystem({
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.08}
+          size={0.2}
           color={"white"}
           transparent
-          opacity={0.8}
+          opacity={0.9}
           sizeAttenuation
-          blending={THREE.NormalBlending}
+          blending={THREE.AdditiveBlending}
           depthWrite={false}
           alphaTest={0.1}
         />
