@@ -15,7 +15,7 @@ export default function StarField({ scroll }) {
   // Generate random star positions with movement data
   const stars = useMemo(() => {
     const temp = [];
-    for (let i = 0; i < 1500; i++) { // Increased count for better coverage
+    for (let i = 0; i < 2500; i++) { // Increased count for better coverage
       const x = (Math.random() - 0.5) * 120; // Larger distribution
       const y = (Math.random() - 0.5) * 120;
       const z = (Math.random() - 0.5) * 120;
