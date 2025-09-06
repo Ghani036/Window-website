@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Lottie from "lottie-react";
 import dustAnimation from "../assets/lottie/dust.json";
 
@@ -21,9 +21,9 @@ const MENUS = [
 export default function Menu({ visibleSubs, onMenuClick, currentSection, isTransitioning }) {
   let subCounter = 0;
 
-  const [menuOpen, setMenuOpen] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(true);
 
-  const toggleMenu = () => setMenuOpen((prev => !prev))
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   const handleClick = (key) => {
     console.log("Menu - handleClick called with key:", key);
@@ -42,39 +42,41 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
 
   return (
     <>
-      <div className=" md:hidden block absolute left-4 top-10 z-50 ">
-        <img src="/assets/menu.png" alt="Menu"
-          className="h-8 w-8 cursor-pointer "
-          onClick={() => toggleMenu()}
+      {/* Mobile Menu Toggle Button */}
+      <div className="md:hidden block absolute left-4 top-10 z-50">
+        <img 
+          src="/assets/menu.png" 
+          alt="Menu"
+          className="h-8 w-8 cursor-pointer"
+          onClick={toggleMenu}
         />
       </div>
 
       <motion.div
         className={`
-      fixed font-semibold md:top-0
-      top-24
-      left-0 w-full 
-      md:left-1/4 md:w-1/2 
-      mx-auto 
-      flex flex-col md:flex-row 
-      md:justify-between 
-      items-start md:items-center 
-      md:p-4 z-50 gap-4
-      ml-4 md:ml-0 mt-4 md:mt-0
-      border-l border-white md:border-none 
-      ${menuOpen ? "block" : "hidden"} 
-     
-  `}
+          fixed font-semibold md:top-0
+          top-24
+          left-0 w-full 
+          md:left-1/4 md:w-1/2 
+          mx-auto 
+          flex flex-col md:flex-row 
+          md:justify-between 
+          items-start md:items-center 
+          md:p-4 z-50 gap-4
+          ml-4 md:ml-0 mt-4 md:mt-0
+          border-l border-white md:border-none 
+          ${menuOpen ? "block" : "hidden"} 
+        `}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: menuOpen ? 1 : 0, y: menuOpen ? 0 : 10 }}
         exit={{ opacity: 0, y: 16 }}
         transition={{ duration: 0.6 }}
       >
         {MENUS.map((item, index) => (
-          <div key={index} className={`relative  `}>
+          <div key={index} className={`relative`}>
             {/* Main Menu */}
-            <div className="flex  text-gray-200 font-avenir items-center relative">
-              <div className="relative md:w-max   ">
+            <div className="flex text-gray-200 font-avenir items-center relative">
+              <div className="relative md:w-max">
                 <Lottie
                   animationData={dustAnimation}
                   loop={false}
@@ -98,11 +100,11 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
             {/* Submenus */}
             <div
               className="
-              mt-2
-              flex flex-col pl-4 
-              md:pl-0
-              md:absolute md:top-full md:left-0 md:mt-2
-            "
+                mt-2
+                flex flex-col pl-4 
+                md:pl-0
+                md:absolute md:top-full md:left-0 md:mt-2
+              "
             >
               {item.sub.map((subItem, subIdx) => {
                 const globalSubIndex = subCounter++;
@@ -111,7 +113,7 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
                 return globalSubIndex < effectiveVisibleSubs ? (
                   <motion.div
                     key={subIdx}
-                    className="text-sm relative w-max flex items-center text-gray-300  px-2"
+                    className="text-sm relative w-max flex items-center text-gray-300 px-2"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
@@ -138,15 +140,11 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
                   </motion.div>
                 ) : null;
               })}
-
-
             </div>
           </div>
         ))}
 
-      
       </motion.div>
     </>
-
   );
 }
