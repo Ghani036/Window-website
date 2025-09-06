@@ -98,11 +98,14 @@ export default function App() {
       )}
 
       <div className="relative w-full h-screen scroll-container">
-        {/* Spline background */}
-        <div className="absolute w-screen h-screen inset-0 z-0 pointer-events-none">
-          <spline-viewer url="https://prod.spline.design/81Udm-xn90eNI45u/scene.splinecode"></spline-viewer>
+        {/* Spline background inside scene container */}
+        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+          <spline-viewer
+            url="https://prod.spline.design/81Udm-xn90eNI45u/scene.splinecode"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
+          ></spline-viewer>
         </div>
-        <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
+        <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full z-10">
           <ScrollControls pages={6} damping={0.05} distance={1} horizontal={false}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 

@@ -37,3 +37,6 @@ body {
   -ms-overflow-style: none;  
   scrollbar-width: none;    
 }
+
+/* Ensure Spline viewer fills containers */
+/* Let in-app wrapper control sizing/position. No global constraints here. */
