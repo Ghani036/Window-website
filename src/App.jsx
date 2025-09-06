@@ -25,14 +25,8 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       
       // Simple logic: Scene 1 (0-60%), Scene 2 (60-100%)
       
-      // Scene 1: Logo + Menu progression (0% to 60%)
-      if (progress <= 0.6) {
-        // Force Scene 1 state
-        if (showContent) {
-          setShowContent(false);
-          setCurrentSection("thewindow");
-        }
-        
+      // Scene 1: Logo + Menu progression (0% to 60%) - ONLY if not already in Scene 2
+      if (progress <= 0.6 && !showContent) {
         // Progressive menu reveal
         const menuProgress = Math.min(progress / 0.6, 1);
         const newVisibleSubs = Math.max(1, Math.floor(menuProgress * totalSubs) + 1);
@@ -61,10 +55,11 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
           }
         }
         
-        // Back to Scene 1 only if scrolling up AND at very beginning
+        // Back to Scene 1 only if scrolling up to very beginning
         if (progress < 0.1 && isScrollingUp && showContent) {
           console.log("Going back to Scene 1");
           onBackToFirstSection();
+          return;
         }
       }
     };

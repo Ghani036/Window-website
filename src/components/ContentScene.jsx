@@ -225,12 +225,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
         <>
           {/* Title Text */}
           <Text
-            position={[0, 0.3 + (1 - animationProgress) * 0.5, 0.94]}
-            fontSize={0.15}
+            position={[0, 0.4 + (1 - animationProgress) * 0.5, 0.94]}
+            fontSize={0.2}
             color="#ffffff"
             anchorX="center"
             anchorY="middle"
-            maxWidth={viewport.width * 0.7}
+            maxWidth={viewport.width * 0.8}
             textAlign="center"
             fontFamily="Arial, sans-serif"
             opacity={animationProgress * fadeIn}
@@ -240,12 +240,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
           {/* Content Text */}
           <Text
-            position={[0, 0 + (1 - animationProgress) * 0.3, 0.94]}
-            fontSize={0.08}
+            position={[0, 0.1 + (1 - animationProgress) * 0.3, 0.94]}
+            fontSize={0.1}
             color="#cccccc"
             anchorX="center"
             anchorY="middle"
-            maxWidth={viewport.width * 0.6}
+            maxWidth={viewport.width * 0.7}
             textAlign="center"
             fontFamily="Arial, sans-serif"
             opacity={animationProgress * 0.9 * fadeIn}
@@ -255,12 +255,12 @@ export default function ContentScene({ scroll, onSectionReached, currentSection,
 
           {/* Description Text */}
           <Text
-            position={[0, -0.2 + (1 - animationProgress) * 0.2, 0.94]}
-            fontSize={0.06}
+            position={[0, -0.3 + (1 - animationProgress) * 0.2, 0.94]}
+            fontSize={0.08}
             color="#aaaaaa"
             anchorX="center"
             anchorY="middle"
-            maxWidth={viewport.width * 0.5}
+            maxWidth={viewport.width * 0.6}
             textAlign="center"
             fontFamily="Arial, sans-serif"
             opacity={animationProgress * 0.8 * fadeIn}
