@@ -37,17 +37,8 @@ export default function Menu({ visibleSubs, onMenuClick, currentSection, isTrans
     }
   };
 
-  // Determine if we're in section two (content sections)
-  // Show all menu items when in any content section (not just thewindow)
-  const isInContentSection = currentSection && currentSection !== "thewindow";
-  
-  // Show all menu items when:
-  // 1. In content sections, OR
-  // 2. All items are already visible (visibleSubs >= 9)
-  // 3. Menu item was clicked (showContent is true)
-  const effectiveVisibleSubs = (isInContentSection || visibleSubs >= 9) ? 
-    9 : // Show all 9 sub-items when in content or all are visible
-    Math.max(1, Math.min(visibleSubs, 9)); // Clamp between 1 and 9
+  // Single-scene mode: reveal up to 9 subs gradually based on visibleSubs
+  const effectiveVisibleSubs = Math.max(1, Math.min(visibleSubs, 9));
 
   return (
     <>

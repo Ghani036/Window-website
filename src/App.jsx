@@ -2,73 +2,29 @@ import React, { useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ScrollControls, useScroll } from "@react-three/drei";
 import Scene from "./components/Scene";
-import ContentScene from "./components/ContentScene";
 import Menu from "./components/Menu";
 import ContactForm from "./components/ContactForm";
 
-function Experience({ setVisibleSubs, setCurrentSection, currentSection, showContent, visibleSubs, onBackToFirstSection, isTransitioning, setShowContent, manuallySelected, setManuallySelected }) {
+function Experience({ setVisibleSubs, setCurrentSection, currentSection, visibleSubs, isTransitioning }) {
   const scroll = useScroll();
   const lastScrollPosition = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       if (isTransitioning) return;
-      
       const progress = scroll.offset;
       const totalSubs = 9;
-      
-      // Track scroll direction
+
       const isScrollingUp = progress < lastScrollPosition.current;
       const scrollDelta = Math.abs(progress - lastScrollPosition.current);
       lastScrollPosition.current = progress;
-      
-      // Reset manual selection if user scrolls significantly (> 5% change)
-      if (manuallySelected && scrollDelta > 0.05) {
-        console.log("Resetting manual selection due to significant scroll");
-        setManuallySelected(false);
-      }
-      
-      console.log("Scroll progress:", progress, "showContent:", showContent, "currentSection:", currentSection);
-      
-      // Simple logic: Scene 1 (0-60%), Scene 2 (60-100%)
-      
-      // Scene 1: Logo + Menu progression (0% to 60%) - ONLY if not already in Scene 2
-      if (progress <= 0.6 && !showContent) {
-        // Progressive menu reveal
-        const menuProgress = Math.min(progress / 0.6, 1);
-        const newVisibleSubs = Math.max(1, Math.floor(menuProgress * totalSubs) + 1);
-        setVisibleSubs(Math.min(newVisibleSubs, totalSubs));
-        return;
-      }
-      
-      // Scene 2: Content sections (60% to 100%)
-      if (progress > 0.6) {
-        // Force Scene 2 state if all menu items are visible
-        if (!showContent && visibleSubs >= totalSubs) {
-          setShowContent(true);
-          setCurrentSection("thefounder");
-        }
-        
-        // Content switching logic (only if in Scene 2 and not manually selected)
-        if (showContent && !manuallySelected) {
-          const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
-          const contentProgress = (progress - 0.6) / 0.4; // 0.6 to 1.0 mapped to 0 to 1
-          const sectionIndex = Math.floor(contentProgress * contentSections.length);
-          const targetSection = contentSections[Math.min(sectionIndex, contentSections.length - 1)];
-          
-          if (targetSection && currentSection !== targetSection && currentSection !== "contact") {
-            console.log("Scene 2: Auto-switching to section:", targetSection);
-            setCurrentSection(targetSection);
-          }
-        }
-        
-        // Back to Scene 1 only if scrolling up to very beginning
-        if (progress < 0.1 && isScrollingUp && showContent) {
-          console.log("Going back to Scene 1");
-          onBackToFirstSection();
-          return;
-        }
-      }
+
+      console.log("Scroll progress:", progress, "currentSection:", currentSection);
+
+      // Progressive menu reveal across entire scroll range since only one scene remains
+      const menuProgress = Math.min(progress / 1.0, 1);
+      const newVisibleSubs = Math.max(1, Math.floor(menuProgress * totalSubs) + 1);
+      setVisibleSubs(Math.min(newVisibleSubs, totalSubs));
     };
 
     if (scroll && scroll.el) {
@@ -76,7 +32,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
       handleScroll();
       return () => scroll.el.removeEventListener("scroll", handleScroll);
     }
-  }, [scroll, setVisibleSubs, visibleSubs, showContent, onBackToFirstSection, currentSection, isTransitioning, setShowContent, setCurrentSection, manuallySelected, setManuallySelected]);
+  }, [scroll, setVisibleSubs, visibleSubs, currentSection, isTransitioning, setCurrentSection]);
 
 
   const handleSectionReached = (sectionId) => {
@@ -85,8 +41,7 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
 
   return (
     <>
-      {!showContent && <Scene showContent={showContent} visibleSubs={visibleSubs} />}
-      {showContent && <ContentScene scroll={scroll} onSectionReached={handleSectionReached} currentSection={currentSection} showContent={showContent} visibleSubs={visibleSubs} isTransitioning={isTransitioning} />}
+      <Scene showContent={false} visibleSubs={visibleSubs} />
     </>
   );
 }
@@ -94,71 +49,25 @@ function Experience({ setVisibleSubs, setCurrentSection, currentSection, showCon
 export default function App() {
   const [visibleSubs, setVisibleSubs] = useState(0);
   const [currentSection, setCurrentSection] = useState("thewindow");
-  const [showContent, setShowContent] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [manuallySelected, setManuallySelected] = useState(false);
 
   // Debug state changes
   useEffect(() => {
-    console.log("App state changed - currentSection:", currentSection, "showContent:", showContent, "isTransitioning:", isTransitioning);
-  }, [currentSection, showContent, isTransitioning]);
+    console.log("App state changed - currentSection:", currentSection, "isTransitioning:", isTransitioning);
+  }, [currentSection, isTransitioning]);
 
   const handleMenuClick = (sectionId) => {
     console.log("Menu clicked:", sectionId);
-    
-    // For contact form
+    // In single-scene mode, only keep contact overlay, otherwise ignore content routing
     if (sectionId === "contact") {
       setCurrentSection(sectionId);
-      setShowContent(true);
       return;
     }
-    
-    // For content sections - go to Scene 2
-    setIsTransitioning(true);
-    setShowContent(true);
-    setCurrentSection(sectionId);
-    setVisibleSubs(9);
-    setManuallySelected(true); // Mark as manually selected
-    
-    // Calculate scroll position in Scene 2 range (60% to 100%)
-    const contentSections = ["thefounder", "joinedforces", "thesystems", "thelab", "theartofstorytelling", "storyboard", "digitalcollageart", "fromsketchtodigitaltoai", "thechamber", "artpiece", "wearthemyth"];
-    const sectionIndex = contentSections.indexOf(sectionId);
-    
-    const scrollElement = document.querySelector('.scroll-container');
-    if (scrollElement) {
-      let targetScrollPercent = 0.65; // Default to early Scene 2
-      
-      if (sectionIndex >= 0) {
-        // Map to 60% - 100% range
-        targetScrollPercent = 0.6 + (sectionIndex / contentSections.length) * 0.4;
-      }
-      
-      scrollElement.scrollTo({
-        top: scrollElement.scrollHeight * targetScrollPercent,
-        behavior: 'smooth'
-      });
-    }
-    
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 600);
+    setCurrentSection("thewindow");
   };
 
   const handleBackToFirstSection = () => {
-    console.log("=== GOING BACK TO FIRST SECTION ===");
-    setIsTransitioning(true);
-    
-    // Reset states to Scene 1
     setCurrentSection("thewindow");
-    setShowContent(false);
-    setVisibleSubs(9); // Keep all menu items visible
-    setManuallySelected(false); // Reset manual selection
-    
-    // Quick transition without auto-scroll
-    setTimeout(() => {
-      setIsTransitioning(false);
-      console.log("=== BACK TO FIRST SECTION COMPLETE ===");
-    }, 200);
   };
 
   return (
@@ -178,7 +87,6 @@ export default function App() {
             <button
               onClick={() => {
                 setCurrentSection("thewindow");
-                setShowContent(false);
               }}
               className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-gray-300 z-10"
             >
@@ -190,19 +98,18 @@ export default function App() {
       )}
 
       <div className="relative w-full h-screen scroll-container">
+        {/* Spline background */}
+        <div className="absolute w-screen h-screen inset-0 z-0 pointer-events-none">
+          <spline-viewer url="https://prod.spline.design/81Udm-xn90eNI45u/scene.splinecode"></spline-viewer>
+        </div>
         <Canvas camera={{ position: [0, 0, 5], fov: 75 }} dpr={[1, 3]} className="absolute top-0 left-0 w-full h-full">
-          <ScrollControls pages={15} damping={0.05} distance={1} horizontal={false}>
+          <ScrollControls pages={6} damping={0.05} distance={1} horizontal={false}>
             <Experience 
               setVisibleSubs={setVisibleSubs} 
               setCurrentSection={setCurrentSection}
               currentSection={currentSection}
-              showContent={showContent}
               visibleSubs={visibleSubs}
-              onBackToFirstSection={handleBackToFirstSection}
               isTransitioning={isTransitioning}
-              setShowContent={setShowContent}
-              manuallySelected={manuallySelected}
-              setManuallySelected={setManuallySelected}
             />
           </ScrollControls>
         </Canvas>
